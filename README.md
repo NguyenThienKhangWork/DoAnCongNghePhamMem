@@ -1,4 +1,4 @@
-# VietRide X
+# VietRide X - DoAnCongNghePhamMem
 
 Full-stack bus ticket booking project based on `vietride-x.html`.
 
