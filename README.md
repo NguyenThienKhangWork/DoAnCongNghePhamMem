@@ -20,9 +20,10 @@ frontend/  React/Vite web app
 Default backend config is in `backend/src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/vietride_x?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
+spring.datasource.url=jdbc:mysql://localhost:3306/vietride_x?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh&useUnicode=true&characterEncoding=UTF-8
 spring.datasource.username=root
-spring.datasource.password=123456
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 ```
 
 Change `username` and `password` to match your MySQL account. Spring Boot creates/updates tables automatically and seeds sample routes/trips on first run.
