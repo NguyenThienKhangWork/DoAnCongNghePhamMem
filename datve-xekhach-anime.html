@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiYuki Express – Đặt Vé Xe Khách Việt Nam</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0D1B2A;
+    --sakura: #FF6B9D;
+    --sakura-light: #FFB3CC;
+    --violet: #7B2FBE;
+    --violet-light: #C084FC;
+    --star: #FFD700;
+    --sky: #1A1A3E;
+    --sky-mid: #2D1B69;
+    --cloud: #F8F0FF;
+    --text: #F0E6FF;
+    --text-muted: #B0A0CC;
+    --card-bg: rgba(255,255,255,0.07);
+    --card-border: rgba(255,107,157,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--sky);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ===== STARS BACKGROUND ===== */
+  .stars-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, #2D1B69 0%, #0D1B2A 60%),
+      linear-gradient(180deg, #1A1A3E 0%, #0D1B2A 100%);
+  }
+
+  .star-dot {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.4); }
+  }
+
+  /* ===== SAKURA PETALS ===== */
+  .sakura-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .petal {
+    position: absolute;
+    top: -20px;
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    animation: fall var(--fall-d, 8s) linear var(--fall-delay, 0s) infinite;
+  }
+  .petal::before, .petal::after {
+    content: '';
+    position: absolute;
+    background: var(--sakura-light);
+    border-radius: 50% 0 50% 0;
+  }
+  .petal::before { width: 10px; height: 7px; top: 0; left: 0; }
+  .petal::after  { width: 10px; height: 7px; top: 4px; left: 2px; transform: rotate(90deg); background: #FFD0E6; }
+
+  @keyframes fall {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.9; }
+    90%  { opacity: 0.7; }
+    100% { transform: translateY(105vh) translateX(60px) rotate(360deg); opacity: 0; }
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 2.5rem;
+    background: rgba(13, 27, 42, 0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,107,157,0.2);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+  }
+  .nav-logo .logo-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.85rem;
+    color: var(--sakura);
+    letter-spacing: 2px;
+  }
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--sakura), var(--violet));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.25s;
+  }
+  .nav-links a:hover { color: var(--sakura); }
+
+  .nav-cta {
+    background: linear-gradient(135deg, var(--sakura), var(--violet));
+    color: white;
+    border: none;
+    padding: 0.5rem 1.4rem;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .nav-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,107,157,0.5);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 6rem 4rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-text h1 {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 0.3rem;
+  }
+  .hero-text h1 .line-jp {
+    display: block;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.55em;
+    color: var(--sakura);
+    letter-spacing: 4px;
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+  }
+  .hero-text h1 .gradient-text {
+    background: linear-gradient(90deg, var(--sakura), var(--star), var(--violet-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-text p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 1.2rem 0 1.8rem;
+    max-width: 400px;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.8rem;
+  }
+  .badge {
+    background: rgba(255,107,157,0.15);
+    border: 1px solid rgba(255,107,157,0.4);
+    color: var(--sakura-light);
+    padding: 0.3rem 0.9rem;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .badge.violet {
+    background: rgba(123,47,190,0.18);
+    border-color: rgba(192,132,252,0.4);
+    color: var(--violet-light);
+  }
+  .badge.star {
+    background: rgba(255,215,0,0.12);
+    border-color: rgba(255,215,0,0.35);
+    color: var(--star);
+  }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--sakura), var(--violet));
+    color: white;
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(255,107,157,0.45);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    padding: 0.85rem 1.6rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--sakura); color: var(--sakura); }
+
+  /* ===== ANIME CHARACTER / ILLUSTRATION ===== */
+  .hero-illustration {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  .anime-scene {
+    width: 100%;
+    max-width: 460px;
+    position: relative;
+  }
+
+  /* ===== BOOKING FORM ===== */
+  .booking-section {
+    position: relative;
+    z-index: 10;
+    background: rgba(13,27,42,0.95);
+    border-top: 1px solid rgba(255,107,157,0.2);
+    padding: 3.5rem 2rem;
+  }
+  .booking-section .section-label {
+    text-align: center;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.8rem;
+    color: var(--sakura);
+    letter-spacing: 4px;
+    margin-bottom: 0.5rem;
+  }
+  .booking-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 2.5rem;
+  }
+
+  .booking-form {
+    max-width: 860px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,107,157,0.25);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+  }
+
+  .form-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50px;
+    padding: 4px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.25s;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--sakura), var(--violet));
+    color: white;
+    box-shadow: 0 4px 16px rgba(255,107,157,0.4);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-field label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--sakura-light);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .form-field input, .form-field select {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,107,157,0.25);
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .form-field input:focus, .form-field select:focus {
+    border-color: var(--sakura);
+    background: rgba(255,107,157,0.08);
+  }
+  .form-field input::placeholder { color: var(--text-muted); }
+  .form-field select option { background: #1A1A3E; }
+
+  .swap-btn {
+    background: rgba(255,107,157,0.15);
+    border: 1px solid rgba(255,107,157,0.4);
+    color: var(--sakura);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.3s;
+    align-self: flex-end;
+    margin-bottom: 1px;
+  }
+  .swap-btn:hover { transform: rotate(180deg); }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .btn-search {
+    background: linear-gradient(135deg, var(--sakura), var(--violet));
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+    margin-top: 1.5rem;
+    letter-spacing: 0.3px;
+  }
+  .btn-search:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(255,107,157,0.5);
+  }
+
+  /* ===== POPULAR ROUTES ===== */
+  .routes-section {
+    position: relative;
+    z-index: 10;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  .section-header h2 { font-size: 1.8rem; font-weight: 900; }
+  .section-header .jp-label {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.75rem;
+    color: var(--sakura);
+    letter-spacing: 3px;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+  .see-all {
+    color: var(--sakura);
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  .see-all:hover { opacity: 1; }
+
+  .routes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+  }
+
+  .route-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .route-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,107,157,0.08), rgba(123,47,190,0.08));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .route-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(255,107,157,0.2); border-color: var(--sakura); }
+  .route-card:hover::before { opacity: 1; }
+
+  .route-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.2rem 0.7rem;
+    border-radius: 50px;
+    letter-spacing: 0.3px;
+  }
+  .route-badge.hot { background: rgba(255,107,157,0.2); color: var(--sakura); border: 1px solid rgba(255,107,157,0.4); }
+  .route-badge.new { background: rgba(123,47,190,0.2); color: var(--violet-light); border: 1px solid rgba(192,132,252,0.4); }
+  .route-badge.sale { background: rgba(255,215,0,0.15); color: var(--star); border: 1px solid rgba(255,215,0,0.3); }
+
+  .route-cities {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+  }
+  .city-name {
+    font-size: 1.15rem;
+    font-weight: 900;
+  }
+  .route-arrow {
+    color: var(--sakura);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .route-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .route-meta span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .route-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 0.8rem;
+  }
+  .route-price {
+    font-size: 1.25rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--sakura), var(--violet-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .route-price .from {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    -webkit-text-fill-color: var(--text-muted);
+    display: block;
+    font-weight: 600;
+  }
+  .route-book-btn {
+    background: rgba(255,107,157,0.12);
+    border: 1px solid rgba(255,107,157,0.35);
+    color: var(--sakura);
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .route-book-btn:hover { background: rgba(255,107,157,0.25); transform: scale(1.04); }
+
+  /* ===== FEATURES ===== */
+  .features-section {
+    position: relative;
+    z-index: 10;
+    background: rgba(255,107,157,0.04);
+    border-top: 1px solid rgba(255,107,157,0.12);
+    border-bottom: 1px solid rgba(255,107,157,0.12);
+    padding: 4rem 2rem;
+  }
+  .features-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+  .feature-card {
+    text-align: center;
+    padding: 2rem 1.2rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,107,157,0.15);
+    border-radius: 20px;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .feature-card:hover { transform: translateY(-4px); border-color: rgba(255,107,157,0.4); }
+  .feature-icon {
+    width: 60px; height: 60px;
+    margin: 0 auto 1rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+  }
+  .feature-icon.pink { background: rgba(255,107,157,0.2); }
+  .feature-icon.violet { background: rgba(123,47,190,0.2); }
+  .feature-icon.star { background: rgba(255,215,0,0.15); }
+  .feature-icon.teal { background: rgba(0,230,200,0.15); }
+  .feature-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .feature-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* ===== STATS ===== */
+  .stats-section {
+    position: relative;
+    z-index: 10;
+    padding: 3.5rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    text-align: center;
+  }
+  .stat-item { padding: 1.5rem; }
+  .stat-num {
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--sakura), var(--star));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+
+  /* ===== TESTIMONIALS ===== */
+  .testimonials-section {
+    position: relative;
+    z-index: 10;
+    padding: 4rem 2rem;
+    background: rgba(13,27,42,0.6);
+  }
+  .testimonials-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+  .testimonial-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,107,157,0.2);
+    border-radius: 20px;
+    padding: 1.5rem;
+  }
+  .stars-row { color: var(--star); font-size: 0.9rem; margin-bottom: 0.8rem; }
+  .testimonial-text {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+    font-style: italic;
+  }
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .author-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .author-name { font-weight: 800; font-size: 0.9rem; }
+  .author-route { font-size: 0.75rem; color: var(--sakura); font-weight: 600; }
+
+  /* ===== APP SECTION ===== */
+  .app-section {
+    position: relative;
+    z-index: 10;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .app-text h2 { font-size: 1.9rem; font-weight: 900; margin-bottom: 1rem; }
+  .app-text p { color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .app-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .app-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,107,157,0.25);
+    border-radius: 14px;
+    padding: 0.75rem 1.2rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .app-btn:hover { border-color: var(--sakura); background: rgba(255,107,157,0.08); }
+  .app-btn .store-icon { font-size: 1.6rem; }
+  .app-btn .store-text small { display: block; font-size: 0.68rem; color: var(--text-muted); }
+  .app-btn .store-text strong { display: block; font-size: 0.95rem; color: var(--text); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    position: relative;
+    z-index: 10;
+    background: rgba(13,27,42,0.98);
+    border-top: 1px solid rgba(255,107,157,0.15);
+    padding: 3rem 2rem 1.5rem;
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .footer-brand p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin: 0.8rem 0 1.2rem;
+    max-width: 240px;
+  }
+  .footer-col h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 1rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 0.5rem; }
+  .footer-col ul li a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+  .footer-col ul li a:hover { color: var(--sakura); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-bottom p { font-size: 0.8rem; color: var(--text-muted); }
+  .footer-socials { display: flex; gap: 0.8rem; }
+  .social-btn {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,107,157,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+  }
+  .social-btn:hover { border-color: var(--sakura); color: var(--sakura); }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 5rem 1.5rem 2rem; }
+    .hero-illustration { display: none; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .form-row-2 { grid-template-columns: 1fr 1fr; }
+    .routes-grid { grid-template-columns: 1fr 1fr; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .stats-section { grid-template-columns: 1fr 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .app-section { grid-template-columns: 1fr; gap: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Stars Background -->
+<div class="stars-bg" id="starsBg"></div>
+
+<!-- Sakura Petals -->
+<div class="sakura-container" id="sakuraContainer"></div>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-icon">🌸</div>
+    <div>
+      <span class="logo-jp">みゆき エクスプレス</span><br>
+      <span style="color:white;">MiYuki Express</span>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#booking">Đặt vé</a></li>
+    <li><a href="#routes">Tuyến đường</a></li>
+    <li><a href="#about">Về chúng tôi</a></li>
+    <li><a href="#support">Hỗ trợ</a></li>
+  </ul>
+  <button class="nav-cta">🎫 Đặt ngay</button>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-text">
+    <h1>
+      <span class="line-jp">✨ たびのはじまり ✨</span>
+      <span class="gradient-text">Hành Trình<br>Việt Nam</span><br>
+      <span style="font-size:0.8em;color:var(--text-muted);font-weight:700;">của bạn bắt đầu ở đây</span>
+    </h1>
+    <p>Đặt vé xe khách toàn quốc dễ dàng — từ Hà Nội đến Sài Gòn, từ Đà Lạt đến Hội An. An toàn, tiện lợi, giá rẻ nhất thị trường! 🚌</p>
+    <div class="hero-badges">
+      <span class="badge">🛡️ Hoàn tiền 100%</span>
+      <span class="badge violet">✅ 2,000+ chuyến/ngày</span>
+      <span class="badge star">⭐ 4.9/5 đánh giá</span>
+    </div>
+    <div class="hero-cta-group">
+      <a href="#booking" class="btn-primary">🎫 Tìm chuyến đi ngay</a>
+      <button class="btn-outline">📋 Xem lịch trình</button>
+    </div>
+  </div>
+
+  <div class="hero-illustration">
+    <svg width="100%" viewBox="0 0 440 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Night sky backdrop -->
+      <ellipse cx="220" cy="460" rx="200" ry="40" fill="rgba(255,107,157,0.08)"/>
+
+      <!-- Moon -->
+      <circle cx="340" cy="60" r="38" fill="#FFF8DC" opacity="0.9"/>
+      <circle cx="326" cy="52" r="32" fill="#2D1B69"/>
+      <!-- Moon crescent highlight -->
+      <circle cx="345" cy="58" r="34" fill="none" stroke="#FFF8DC" stroke-width="1" opacity="0.3"/>
+
+      <!-- Stars around moon -->
+      <circle cx="290" cy="45" r="2" fill="#FFD700" opacity="0.8"/>
+      <circle cx="310" cy="25" r="1.5" fill="white" opacity="0.7"/>
+      <circle cx="370" cy="30" r="2.5" fill="#FFD700" opacity="0.9"/>
+      <circle cx="390" cy="65" r="1.5" fill="white" opacity="0.6"/>
+      <circle cx="365" cy="100" r="2" fill="#FFB3CC" opacity="0.8"/>
+
+      <!-- Bus body -->
+      <rect x="30" y="300" width="380" height="130" rx="22" fill="#1E3A5F"/>
+      <rect x="30" y="300" width="380" height="130" rx="22" stroke="rgba(255,107,157,0.5)" stroke-width="1.5"/>
+
+      <!-- Bus stripe (sakura gradient feel) -->
+      <rect x="30" y="340" width="380" height="18" fill="rgba(255,107,157,0.25)"/>
+      <rect x="30" y="355" width="380" height="4" fill="rgba(255,107,157,0.5)"/>
+
+      <!-- Windshield -->
+      <rect x="320" y="312" width="72" height="55" rx="8" fill="rgba(135,206,250,0.35)" stroke="rgba(135,206,250,0.6)" stroke-width="1"/>
+      <!-- Windshield reflection -->
+      <line x1="330" y1="320" x2="345" y2="360" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+
+      <!-- Windows row -->
+      <rect x="50" y="312" width="52" height="45" rx="6" fill="rgba(135,206,250,0.25)" stroke="rgba(135,206,250,0.5)" stroke-width="1"/>
+      <rect x="115" y="312" width="52" height="45" rx="6" fill="rgba(135,206,250,0.25)" stroke="rgba(135,206,250,0.5)" stroke-width="1"/>
+      <rect x="180" y="312" width="52" height="45" rx="6" fill="rgba(135,206,250,0.25)" stroke="rgba(135,206,250,0.5)" stroke-width="1"/>
+      <rect x="245" y="312" width="52" height="45" rx="6" fill="rgba(135,206,250,0.25)" stroke="rgba(135,206,250,0.5)" stroke-width="1"/>
+
+      <!-- Window silhouettes (passengers) -->
+      <ellipse cx="76" cy="330" rx="10" ry="10" fill="rgba(255,107,157,0.3)"/>
+      <ellipse cx="141" cy="333" rx="8" ry="8" fill="rgba(192,132,252,0.35)"/>
+      <ellipse cx="206" cy="331" rx="9" ry="9" fill="rgba(255,215,0,0.25)"/>
+
+      <!-- Bus door -->
+      <rect x="265" y="355" width="35" height="72" rx="4" fill="rgba(255,107,157,0.12)" stroke="rgba(255,107,157,0.4)" stroke-width="1"/>
+      <line x1="282" y1="358" x2="282" y2="424" stroke="rgba(255,107,157,0.3)" stroke-width="0.8"/>
+
+      <!-- Wheels -->
+      <circle cx="100" cy="430" r="28" fill="#0D1B2A" stroke="rgba(255,107,157,0.4)" stroke-width="2"/>
+      <circle cx="100" cy="430" r="18" fill="#1E3A5F" stroke="rgba(255,107,157,0.3)" stroke-width="1"/>
+      <circle cx="100" cy="430" r="7" fill="rgba(255,107,157,0.6)"/>
+      <circle cx="330" cy="430" r="28" fill="#0D1B2A" stroke="rgba(255,107,157,0.4)" stroke-width="2"/>
+      <circle cx="330" cy="430" r="18" fill="#1E3A5F" stroke="rgba(255,107,157,0.3)" stroke-width="1"/>
+      <circle cx="330" cy="430" r="7" fill="rgba(255,107,157,0.6)"/>
+
+      <!-- Bus license plate -->
+      <rect x="160" y="412" width="80" height="20" rx="3" fill="rgba(255,255,255,0.9)"/>
+      <text x="200" y="426" text-anchor="middle" font-size="9" font-weight="700" fill="#0D1B2A" font-family="Nunito, sans-serif">51B – 88888</text>
+
+      <!-- Bus headlights -->
+      <ellipse cx="408" cy="365" rx="8" ry="12" fill="rgba(255,240,150,0.7)" stroke="rgba(255,240,150,0.5)" stroke-width="1"/>
+      <ellipse cx="408" cy="385" rx="6" ry="8" fill="rgba(255,200,100,0.6)"/>
+
+      <!-- Logo on bus -->
+      <text x="180" y="338" text-anchor="middle" font-size="11" font-weight="900" fill="rgba(255,107,157,0.9)" font-family="Nunito, sans-serif">🌸 MiYuki Express</text>
+
+      <!-- Anime girl character -->
+      <!-- Body / dress -->
+      <ellipse cx="195" cy="285" rx="28" ry="45" fill="#FF6B9D" opacity="0.9"/>
+      <ellipse cx="195" cy="305" rx="22" ry="32" fill="#FF85AD"/>
+      <!-- Dress trim -->
+      <ellipse cx="195" cy="320" rx="26" ry="12" fill="#FFB3CC" opacity="0.8"/>
+      <!-- Bow on chest -->
+      <path d="M182 268 Q195 273 208 268 Q195 263 182 268Z" fill="#7B2FBE" opacity="0.9"/>
+
+      <!-- Neck -->
+      <rect x="190" y="240" width="10" height="15" rx="5" fill="#FFD5B5"/>
+
+      <!-- Head -->
+      <ellipse cx="195" cy="228" rx="26" ry="28" fill="#FFD5B5"/>
+      <!-- Hair (long, dark with purple sheen) -->
+      <ellipse cx="195" cy="210" rx="27" ry="20" fill="#1A1A2E"/>
+      <path d="M168 215 Q155 250 162 290 Q170 295 175 285 Q172 255 178 235Z" fill="#1A1A2E"/>
+      <path d="M222 215 Q235 250 228 290 Q220 295 215 285 Q218 255 212 235Z" fill="#1A1A2E"/>
+      <path d="M168 215 Q180 200 195 198 Q210 200 222 215 Q215 205 195 202 Q175 205 168 215Z" fill="#2D1B69"/>
+      <!-- Hair accessory - sakura clip -->
+      <circle cx="175" cy="210" r="7" fill="#FF6B9D"/>
+      <circle cx="175" cy="210" r="4" fill="#FFB3CC"/>
+      <!-- Eye left -->
+      <ellipse cx="183" cy="228" rx="7" ry="8" fill="white"/>
+      <ellipse cx="183" cy="230" rx="5" ry="6" fill="#7B2FBE"/>
+      <ellipse cx="183" cy="230" rx="3" ry="4" fill="#2D1B69"/>
+      <circle cx="185" cy="227" r="1.5" fill="white"/>
+      <!-- Eye right -->
+      <ellipse cx="207" cy="228" rx="7" ry="8" fill="white"/>
+      <ellipse cx="207" cy="230" rx="5" ry="6" fill="#7B2FBE"/>
+      <ellipse cx="207" cy="230" rx="3" ry="4" fill="#2D1B69"/>
+      <circle cx="209" cy="227" r="1.5" fill="white"/>
+      <!-- Eyelashes -->
+      <path d="M176 222 Q180 219 184 221" stroke="#1A1A2E" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M200 222 Q204 219 208 221" stroke="#1A1A2E" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- Blush -->
+      <ellipse cx="175" cy="237" rx="7" ry="4" fill="rgba(255,107,157,0.4)"/>
+      <ellipse cx="215" cy="237" rx="7" ry="4" fill="rgba(255,107,157,0.4)"/>
+      <!-- Nose -->
+      <circle cx="195" cy="234" r="2" fill="rgba(255,150,120,0.5)"/>
+      <!-- Mouth/smile -->
+      <path d="M189 242 Q195 247 201 242" stroke="#FF6B9D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- Eyebrows -->
+      <path d="M176 220 Q183 217 189 219" stroke="#1A1A2E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M200 219 Q206 217 213 220" stroke="#1A1A2E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+      <!-- Arm holding ticket -->
+      <path d="M168 270 Q148 275 138 285" stroke="#FFD5B5" stroke-width="12" stroke-linecap="round" fill="none"/>
+      <!-- Ticket -->
+      <rect x="108" y="278" width="50" height="32" rx="5" fill="white" opacity="0.95"/>
+      <rect x="108" y="278" width="50" height="10" rx="3" fill="#FF6B9D"/>
+      <text x="133" y="287" text-anchor="middle" font-size="6" font-weight="700" fill="white" font-family="Nunito, sans-serif">VÉ XE</text>
+      <line x1="114" y1="294" x2="152" y2="294" stroke="#DDD" stroke-width="0.8"/>
+      <text x="133" y="302" text-anchor="middle" font-size="5.5" fill="#555" font-family="Nunito, sans-serif">HN → HCM</text>
+      <text x="133" y="308" text-anchor="middle" font-size="5" fill="#888" font-family="Nunito, sans-serif">18/06/2026</text>
+
+      <!-- Speech bubble -->
+      <rect x="230" y="165" width="145" height="55" rx="14" fill="white" opacity="0.95"/>
+      <path d="M238 220 L226 232 L248 220Z" fill="white" opacity="0.95"/>
+      <text x="302" y="188" text-anchor="middle" font-size="9.5" font-weight="700" fill="#FF6B9D" font-family="Nunito, sans-serif">いらっしゃいませ！</text>
+      <text x="302" y="203" text-anchor="middle" font-size="9" font-weight="600" fill="#333" font-family="Nunito, sans-serif">Đặt vé dễ dàng!</text>
+      <text x="302" y="214" text-anchor="middle" font-size="8" fill="#888" font-family="Nunito, sans-serif">🌸 Giá tốt nhất hôm nay</text>
+
+      <!-- Sakura petals floating around character -->
+      <g transform="rotate(-15, 135, 200)">
+        <ellipse cx="135" cy="200" rx="6" ry="4" fill="rgba(255,179,204,0.8)"/>
+        <ellipse cx="139" cy="203" rx="6" ry="4" fill="rgba(255,209,224,0.7)"/>
+      </g>
+      <g transform="rotate(20, 255, 160)">
+        <ellipse cx="255" cy="160" rx="5" ry="3" fill="rgba(255,179,204,0.8)"/>
+        <ellipse cx="259" cy="163" rx="5" ry="3" fill="rgba(255,209,224,0.7)"/>
+      </g>
+      <g transform="rotate(-30, 145, 250)">
+        <ellipse cx="145" cy="250" rx="5" ry="3.5" fill="rgba(255,179,204,0.7)"/>
+        <ellipse cx="149" cy="253" rx="5" ry="3.5" fill="rgba(255,209,224,0.6)"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- Booking Form -->
+<section class="booking-section" id="booking">
+  <div class="section-label">チケット予約 • ĐẶT VÉ</div>
+  <h2>🎫 Tìm Chuyến Đi</h2>
+  <div class="booking-form">
+    <div class="form-tabs">
+      <button class="tab-btn active">🚌 Một chiều</button>
+      <button class="tab-btn">↩️ Khứ hồi</button>
+      <button class="tab-btn">📅 Nhiều ngày</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-field">
+        <label>🚩 Điểm đi</label>
+        <select>
+          <option value="">Chọn điểm đi...</option>
+          <option>Hà Nội (Bến xe Mỹ Đình)</option>
+          <option>Hà Nội (Bến xe Giáp Bát)</option>
+          <option>TP. Hồ Chí Minh (Miền Đông)</option>
+          <option>TP. Hồ Chí Minh (Miền Tây)</option>
+          <option>Đà Nẵng</option>
+          <option>Đà Lạt</option>
+          <option>Nha Trang</option>
+          <option>Huế</option>
+          <option>Hội An</option>
+          <option>Cần Thơ</option>
+          <option>Tây Ninh</option>
+          <option>Vũng Tàu</option>
+        </select>
+      </div>
+
+      <div style="display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px;">
+        <button class="swap-btn" title="Đổi chiều">⇄</button>
+      </div>
+
+      <div class="form-field">
+        <label>🏁 Điểm đến</label>
+        <select>
+          <option value="">Chọn điểm đến...</option>
+          <option>TP. Hồ Chí Minh (Miền Đông)</option>
+          <option>TP. Hồ Chí Minh (Miền Tây)</option>
+          <option>Hà Nội (Bến xe Mỹ Đình)</option>
+          <option>Đà Nẵng</option>
+          <option>Đà Lạt</option>
+          <option>Nha Trang</option>
+          <option>Huế</option>
+          <option>Hội An</option>
+          <option>Cần Thơ</option>
+          <option>Tây Ninh</option>
+          <option>Vũng Tàu</option>
+          <option>Quy Nhơn</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>📅 Ngày đi</label>
+        <input type="date" value="2026-06-20" min="2026-06-18">
+      </div>
+    </div>
+
+    <div class="form-row-2">
+      <div class="form-field">
+        <label>👥 Số hành khách</label>
+        <select>
+          <option>1 hành khách</option>
+          <option>2 hành khách</option>
+          <option>3 hành khách</option>
+          <option>4+ hành khách</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>🪑 Loại ghế</label>
+        <select>
+          <option>Tất cả loại xe</option>
+          <option>Ghế ngồi thường</option>
+          <option>Ghế ngồi VIP</option>
+          <option>Giường nằm</option>
+          <option>Giường nằm VIP (Limousine)</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>⏰ Giờ khởi hành</label>
+        <select>
+          <option>Tất cả giờ</option>
+          <option>Sáng (5h – 12h)</option>
+          <option>Chiều (12h – 17h)</option>
+          <option>Tối (17h – 22h)</option>
+          <option>Đêm (22h – 5h)</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>💰 Khoảng giá</label>
+        <select>
+          <option>Tất cả mức giá</option>
+          <option>Dưới 100,000đ</option>
+          <option>100,000 – 300,000đ</option>
+          <option>300,000 – 500,000đ</option>
+          <option>Trên 500,000đ</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-search">🔍 Tìm kiếm chuyến đi ngay</button>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-section">
+  <div class="stat-item">
+    <div class="stat-num">2,500+</div>
+    <div class="stat-label">🚌 Chuyến xe mỗi ngày</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">63</div>
+    <div class="stat-label">📍 Tỉnh thành phủ sóng</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">850+</div>
+    <div class="stat-label">🏢 Nhà xe đối tác</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">5M+</div>
+    <div class="stat-label">😊 Khách hàng hài lòng</div>
+  </div>
+</div>
+
+<!-- Popular Routes -->
+<section class="routes-section" id="routes">
+  <div class="section-header">
+    <div>
+      <span class="jp-label">人気のルート</span>
+      <h2>Tuyến Đường Phổ Biến</h2>
+    </div>
+    <a href="#" class="see-all">Xem tất cả →</a>
+  </div>
+
+  <div class="routes-grid">
+    <div class="route-card">
+      <span class="route-badge hot">🔥 HOT</span>
+      <div class="route-cities">
+        <span class="city-name">Hà Nội</span>
+        <span class="route-arrow">→</span>
+        <span class="city-name">TP.HCM</span>
+      </div>
+      <div class="route-meta">
+        <span>⏱ 36 giờ</span>
+        <span>📏 1,726 km</span>
+        <span>🚌 28 chuyến</span>
+      </div>
+      <div class="route-footer">
+        <div class="route-price">
+          <span class="from">Từ</span>
+          450,000đ
+        </div>
+        <button class="route-book-btn">Đặt vé</button>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <span class="route-badge sale">💸 SALE</span>
+      <div class="route-cities">
+        <span class="city-name">TP.HCM</span>
+        <span class="route-arrow">→</span>
+        <span class="city-name">Đà Lạt</span>
+      </div>
+      <div class="route-meta">
+        <span>⏱ 7 giờ</span>
+        <span>📏 308 km</span>
+        <span>🚌 45 chuyến</span>
+      </div>
+      <div class="route-footer">
+        <div class="route-price">
+          <span class="from">Từ</span>
+          120,000đ
+        </div>
+        <button class="route-book-btn">Đặt vé</button>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <span class="route-badge new">✨ MỚI</span>
+      <div class="route-cities">
+        <span class="city-name">Hà Nội</span>
+        <span class="route-arrow">→</span>
+        <span class="city-name">Đà Nẵng</span>
+      </div>
+      <div class="route-meta">
+        <span>⏱ 16 giờ</span>
+        <span>📏 763 km</span>
+        <span>🚌 18 chuyến</span>
+      </div>
+      <div class="route-footer">
+        <div class="route-price">
+          <span class="from">Từ</span>
+          280,000đ
+        </div>
+        <button class="route-book-btn">Đặt vé</button>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <span class="route-badge hot">🔥 HOT</span>
+      <div class="route-cities">
+        <span class="city-name">TP.HCM</span>
+        <span class="route-arrow">→</span>
+        <span class="city-name">Cần Thơ</span>
+      </div>
+      <div class="route-meta">
+        <span>⏱ 3.5 giờ</span>
+        <span>📏 165 km</span>
+        <span>🚌 60+ chuyến</span>
+      </div>
+      <div class="route-footer">
+        <div class="route-price">
+          <span class="from">Từ</span>
+          80,000đ
+        </div>
+        <button class="route-book-btn">Đặt vé</button>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <span class="route-badge sale">💸 SALE</span>
+      <div class="route-cities">
+        <span class="city-name">TP.HCM</span>
+        <span class="route-arrow">→</span>
+        <span class="city-name">Nha Trang</span>
+      </div>
+      <div class="route-meta">
+        <span>⏱ 9 giờ</span>
+        <span>📏 447 km</span>
+        <span>🚌 32 chuyến</span>
+      </div>
+      <div class="route-footer">
+        <div class="route-price">
+          <span class="from">Từ</span>
+          200,000đ
+        </div>
+        <button class="route-book-btn">Đặt vé</button>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <span class="route-badge new">✨ MỚI</span>
+      <div class="route-cities">
+        <span class="city-name">Đà Nẵng</span>
+        <span class="route-arrow">→</span>
+        <span class="city-name">Hội An</span>
+      </div>
+      <div class="route-meta">
+        <span>⏱ 1 giờ</span>
+        <span>📏 30 km</span>
+        <span>🚌 80+ chuyến</span>
+      </div>
+      <div class="route-footer">
+        <div class="route-price">
+          <span class="from">Từ</span>
+          35,000đ
+        </div>
+        <button class="route-book-btn">Đặt vé</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features-section">
+  <div class="features-inner">
+    <div style="text-align:center;">
+      <div style="font-family:'Noto Sans JP',sans-serif;font-size:0.8rem;color:var(--sakura);letter-spacing:4px;margin-bottom:0.5rem;">なぜ私たちを選ぶの？</div>
+      <h2 style="font-size:1.8rem;font-weight:900;">Tại Sao Chọn MiYuki?</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon pink">💳</div>
+        <h3>Thanh toán an toàn</h3>
+        <p>Hỗ trợ MoMo, ZaloPay, VNPay, thẻ ngân hàng và hơn 10 phương thức thanh toán</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon violet">🔔</div>
+        <h3>Thông báo thời gian thực</h3>
+        <p>Nhận SMS & app notification tức thì khi xe sắp đến điểm đón của bạn</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon star">💰</div>
+        <h3>Giá tốt nhất</h3>
+        <p>Cam kết giá vé thấp nhất. Hoàn tiền 100% nếu bạn tìm được giá rẻ hơn</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon teal">🎯</div>
+        <h3>Chọn ghế trực quan</h3>
+        <p>Xem sơ đồ chỗ ngồi và chọn ghế yêu thích ngay trên ứng dụng dễ dàng</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials-section">
+  <div class="testimonials-inner">
+    <div style="text-align:center;">
+      <div style="font-family:'Noto Sans JP',sans-serif;font-size:0.8rem;color:var(--sakura);letter-spacing:4px;margin-bottom:0.5rem;">お客様の声</div>
+      <h2 style="font-size:1.8rem;font-weight:900;">Khách Hàng Nói Gì? ✨</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars-row">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"App đặt vé cực kỳ mượt mà và đẹp, giao diện kawaii lắm! Tôi đặt được vé Hà Nội – Đà Nẵng chỉ mất 2 phút, giá còn rẻ hơn mua trực tiếp bến xe."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(255,107,157,0.2);">🌸</div>
+          <div>
+            <div class="author-name">Nguyễn Thị Lan Anh</div>
+            <div class="author-route">Hà Nội → Đà Nẵng</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars-row">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Từ khi dùng MiYuki, tôi không phải xếp hàng ở bến xe nữa. Đặt vé online, lên xe là xong. Giường nằm limousine rất thoải mái!"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(123,47,190,0.2);">🌙</div>
+          <div>
+            <div class="author-name">Trần Minh Quân</div>
+            <div class="author-route">TP.HCM → Đà Lạt</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars-row">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Hoàn tiền nhanh chóng khi tôi cần đổi lịch. Chăm sóc khách hàng nhiệt tình 24/7. Sẽ tiếp tục sử dụng và giới thiệu cho bạn bè!"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(255,215,0,0.15);">⭐</div>
+          <div>
+            <div class="author-name">Phạm Thu Hương</div>
+            <div class="author-route">TP.HCM → Cần Thơ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- App Section -->
+<section class="app-section" id="about">
+  <div class="app-text">
+    <div style="font-family:'Noto Sans JP',sans-serif;font-size:0.8rem;color:var(--sakura);letter-spacing:4px;margin-bottom:0.5rem;">アプリをダウンロード</div>
+    <h2>📱 Tải App MiYuki<br>Đặt vé nhanh hơn!</h2>
+    <p>Quản lý tất cả vé xe, xem trực tiếp vị trí xe trên bản đồ, và nhận ưu đãi độc quyền chỉ có trên app. Hoàn toàn miễn phí!</p>
+    <div class="app-btns">
+      <div class="app-btn">
+        <span class="store-icon">🍎</span>
+        <div class="store-text">
+          <small>Tải về trên</small>
+          <strong>App Store</strong>
+        </div>
+      </div>
+      <div class="app-btn">
+        <span class="store-icon">🤖</span>
+        <div class="store-text">
+          <small>Tải về trên</small>
+          <strong>Google Play</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:relative;display:flex;justify-content:center;">
+    <!-- Phone mockup with app -->
+    <svg width="260" viewBox="0 0 260 520" xmlns="http://www.w3.org/2000/svg">
+      <!-- Phone frame -->
+      <rect x="15" y="10" width="230" height="500" rx="36" fill="#1E1E3A" stroke="rgba(255,107,157,0.5)" stroke-width="2"/>
+      <rect x="22" y="18" width="216" height="484" rx="30" fill="#0D1B2A"/>
+      <!-- Notch -->
+      <rect x="90" y="20" width="80" height="20" rx="10" fill="#1E1E3A"/>
+      <!-- Screen content -->
+      <rect x="28" y="50" width="204" height="440" rx="24" fill="#1A1A3E"/>
+      <!-- App header -->
+      <rect x="28" y="50" width="204" height="60" rx="0" fill="rgba(255,107,157,0.2)"/>
+      <text x="130" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="white" font-family="Nunito,sans-serif">🌸 MiYuki Express</text>
+      <text x="130" y="90" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.6)" font-family="Nunito,sans-serif">Xin chào, Lan Anh! ✨</text>
+      <!-- Search bar -->
+      <rect x="40" y="122" width="180" height="30" rx="15" fill="rgba(255,255,255,0.08)" stroke="rgba(255,107,157,0.3)" stroke-width="1"/>
+      <text x="84" y="141" font-size="9" fill="rgba(255,255,255,0.5)" font-family="Nunito,sans-serif">🔍  Tìm chuyến đi...</text>
+      <!-- Upcoming trip card -->
+      <rect x="36" y="164" width="188" height="80" rx="12" fill="rgba(255,107,157,0.15)" stroke="rgba(255,107,157,0.3)" stroke-width="1"/>
+      <text x="46" y="180" font-size="7.5" font-weight="700" fill="rgba(255,107,157,0.9)" font-family="Nunito,sans-serif">🎫 CHUYẾN ĐI SẮP TỚI</text>
+      <text x="46" y="196" font-size="11" font-weight="900" fill="white" font-family="Nunito,sans-serif">HN → ĐÀ NẴNG</text>
+      <text x="46" y="210" font-size="8" fill="rgba(255,255,255,0.7)" font-family="Nunito,sans-serif">20/06/2026 • 22:00 • Giường VIP</text>
+      <rect x="165" y="218" width="50" height="18" rx="9" fill="rgba(255,107,157,0.3)"/>
+      <text x="190" y="230" text-anchor="middle" font-size="7.5" font-weight="700" fill="#FFB3CC" font-family="Nunito,sans-serif">Xem vé</text>
+      <!-- Quick options -->
+      <text x="46" y="264" font-size="8.5" font-weight="700" fill="rgba(255,255,255,0.6)" font-family="Nunito,sans-serif">TUYẾN PHỔ BIẾN</text>
+      <!-- Route mini card 1 -->
+      <rect x="36" y="272" width="85" height="55" rx="10" fill="rgba(255,255,255,0.05)" stroke="rgba(255,107,157,0.2)" stroke-width="0.8"/>
+      <text x="78" y="290" text-anchor="middle" font-size="8" font-weight="700" fill="white" font-family="Nunito,sans-serif">HCM → ĐL</text>
+      <text x="78" y="302" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.5)" font-family="Nunito,sans-serif">7 giờ • 45 chuyến</text>
+      <text x="78" y="318" text-anchor="middle" font-size="9" font-weight="800" fill="#FF6B9D" font-family="Nunito,sans-serif">120k</text>
+      <!-- Route mini card 2 -->
+      <rect x="130" y="272" width="85" height="55" rx="10" fill="rgba(255,255,255,0.05)" stroke="rgba(192,132,252,0.2)" stroke-width="0.8"/>
+      <text x="172" y="290" text-anchor="middle" font-size="8" font-weight="700" fill="white" font-family="Nunito,sans-serif">HCM → NT</text>
+      <text x="172" y="302" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.5)" font-family="Nunito,sans-serif">9 giờ • 32 chuyến</text>
+      <text x="172" y="318" text-anchor="middle" font-size="9" font-weight="800" fill="#C084FC" font-family="Nunito,sans-serif">200k</text>
+      <!-- Bottom nav -->
+      <rect x="28" y="448" width="204" height="44" rx="0" fill="rgba(13,27,42,0.95)"/>
+      <text x="67" y="474" text-anchor="middle" font-size="16" font-family="Nunito,sans-serif">🏠</text>
+      <text x="108" y="474" text-anchor="middle" font-size="16" font-family="Nunito,sans-serif">🎫</text>
+      <text x="149" y="474" text-anchor="middle" font-size="16" font-family="Nunito,sans-serif">📍</text>
+      <text x="190" y="474" text-anchor="middle" font-size="16" font-family="Nunito,sans-serif">👤</text>
+      <!-- Active indicator -->
+      <circle cx="67" cy="480" r="2.5" fill="#FF6B9D"/>
+      <!-- Bottom bar indicator -->
+      <rect x="90" y="500" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+    </svg>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo" style="margin-bottom:0.5rem;">
+          <div class="logo-icon">🌸</div>
+          <div>
+            <span class="logo-jp">みゆき エクスプレス</span><br>
+            <span style="color:white;font-size:1.1rem;">MiYuki Express</span>
+          </div>
+        </div>
+        <p>Nền tảng đặt vé xe khách hàng đầu Việt Nam. Kết nối 63 tỉnh thành với hơn 850 nhà xe đối tác uy tín.</p>
+        <div style="font-size:0.8rem;color:var(--text-muted);">📧 support@miyuki.vn&nbsp;&nbsp;📞 1900 8888</div>
+      </div>
+      <div class="footer-col">
+        <h4>Dịch vụ</h4>
+        <ul>
+          <li><a href="#">Đặt vé xe khách</a></li>
+          <li><a href="#">Xe limousine</a></li>
+          <li><a href="#">Xe ghép</a></li>
+          <li><a href="#">Thuê xe du lịch</a></li>
+          <li><a href="#">Vé tháng</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hỗ trợ</h4>
+        <ul>
+          <li><a href="#">Câu hỏi thường gặp</a></li>
+          <li><a href="#">Chính sách hoàn vé</a></li>
+          <li><a href="#">Liên hệ chăm sóc</a></li>
+          <li><a href="#">Báo cáo sự cố</a></li>
+          <li><a href="#">Hướng dẫn sử dụng</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Công ty</h4>
+        <ul>
+          <li><a href="#">Về MiYuki Express</a></li>
+          <li><a href="#">Tuyển dụng</a></li>
+          <li><a href="#">Đối tác nhà xe</a></li>
+          <li><a href="#">Báo chí</a></li>
+          <li><a href="#">Điều khoản & Bảo mật</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MiYuki Express. Made with 🌸 tại Việt Nam</p>
+      <div class="footer-socials">
+        <a href="#" class="social-btn">f</a>
+        <a href="#" class="social-btn">📷</a>
+        <a href="#" class="social-btn">🐦</a>
+        <a href="#" class="social-btn">▶</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Generate stars
+  const bg = document.getElementById('starsBg');
+  for (let i = 0; i < 180; i++) {
+    const s = document.createElement('div');
+    s.className = 'star-dot';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      --d:${2+Math.random()*4}s;
+      --delay:-${Math.random()*5}s;
+    `;
+    bg.appendChild(s);
+  }
+
+  // Generate sakura petals
+  const sc = document.getElementById('sakuraContainer');
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      --fall-d:${7+Math.random()*8}s;
+      --fall-delay:${Math.random()*10}s;
+    `;
+    sc.appendChild(p);
+  }
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Swap button
+  document.querySelector('.swap-btn').addEventListener('click', function() {
+    const selects = document.querySelectorAll('.form-grid select');
+    const v1 = selects[0].value, v2 = selects[1].value;
+    selects[0].value = v2;
+    selects[1].value = v1;
+  });
+
+  // Route card hover → book button pulse
+  document.querySelectorAll('.route-book-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.textContent = '✅ Đã chọn!';
+      setTimeout(() => btn.textContent = 'Đặt vé', 1500);
+    });
+  });
+
+  // Smooth scroll for nav links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+    });
+  });
+</script>
+</body>
+</html>

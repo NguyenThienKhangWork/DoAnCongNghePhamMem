@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #0D1B2A;
+  --sakura: #FF6B9D;
+  --sakura-light: #FFB3CC;
+  --violet: #7B2FBE;
+  --violet-light: #C084FC;
+  --star: #FFD700;
+  --sky: #1A1A3E;
+  --sky-mid: #2D1B69;
+  --cloud: #F8F0FF;
+  --text: #F0E6FF;
+  --text-muted: #B0A0CC;
+  --card-bg: rgba(255,255,255,0.07);
+  --card-border: rgba(255,107,157,0.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--sky);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+#root { min-height: 100vh; }
+
+/* Stars */
+.stars-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, #2D1B69 0%, #0D1B2A 60%),
+    linear-gradient(180deg, #1A1A3E 0%, #0D1B2A 100%);
+}
+
+.star-dot {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+}
+
+@keyframes twinkle {
+  0%,100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+/* Sakura petals */
+.sakura-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -20px;
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  animation: fall var(--fall-d, 8s) linear var(--fall-delay, 0s) infinite;
+}
+.petal::before, .petal::after {
+  content: '';
+  position: absolute;
+  background: var(--sakura-light);
+  border-radius: 50% 0 50% 0;
+}
+.petal::before { width: 10px; height: 7px; top: 0; left: 0; }
+.petal::after  { width: 10px; height: 7px; top: 4px; left: 2px; transform: rotate(90deg); background: #FFD0E6; }
+
+@keyframes fall {
+  0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.9; }
+  90%  { opacity: 0.7; }
+  100% { transform: translateY(105vh) translateX(60px) rotate(360deg); opacity: 0; }
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(90deg, var(--sakura), var(--star), var(--violet-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Form select dark */
+select option { background: #1A1A3E; color: #F0E6FF; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0D1B2A; }
+::-webkit-scrollbar-thumb { background: rgba(255,107,157,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,107,157,0.7); }
