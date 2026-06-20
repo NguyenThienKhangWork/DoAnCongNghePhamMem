@@ -2,6 +2,7 @@ package com.miyuki.controller;
 
 import com.miyuki.dto.ChangePasswordRequest;
 import com.miyuki.dto.UpdateProfileRequest;
+import com.miyuki.dto.UserDTO;
 import com.miyuki.entity.User;
 import com.miyuki.service.AuthService;
 import com.miyuki.service.UserService;
@@ -28,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<User> getUserProfile() {
-        return ResponseEntity.ok(getCurrentUser());
+    public ResponseEntity<UserDTO> getUserProfile() {
+        return ResponseEntity.ok(UserDTO.from(getCurrentUser()));
     }
 
     @PutMapping("/profile")
@@ -41,7 +42,7 @@ public class UserController {
             .address(request.getAddress())
             .build();
         User result = userService.updateUser(currentUser.getUserId(), updated);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(UserDTO.from(result));
     }
 
     @PostMapping("/change-password")

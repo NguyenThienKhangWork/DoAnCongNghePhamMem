@@ -3,6 +3,7 @@ package com.miyuki.controller;
 import com.miyuki.dto.AuthRequest;
 import com.miyuki.dto.LoginResponse;
 import com.miyuki.dto.ErrorResponse;
+import com.miyuki.dto.UserDTO;
 import com.miyuki.entity.User;
 import com.miyuki.service.UserService;
 import com.miyuki.service.AuthService;
@@ -28,7 +29,7 @@ public class AuthController {
                 request.getFullName(),
                 request.getPhone()
             );
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.from(user));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage(), 400, "/auth/register"));
@@ -42,7 +43,7 @@ public class AuthController {
             User user = authService.getUserFromToken(token);
             LoginResponse response = LoginResponse.builder()
                 .token(token)
-                .user(user)
+                .user(UserDTO.from(user))
                 .build();
             return ResponseEntity.ok(response);
         } catch (Exception e) {

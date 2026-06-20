@@ -23,4 +23,4 @@ COPY --from=0 /app/dist .
 
 EXPOSE 5173
 
-CMD ["serve", "-s", ".", "-l", "5173"]
+CMD ["serve", "-s", ".", "-l", "5173", "--no-clipboard"]

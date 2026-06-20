@@ -3,9 +3,11 @@ package com.miyuki.controller;
 import com.miyuki.repository.*;
 import com.miyuki.entity.*;
 import com.miyuki.dto.CreateTripRequest;
+import com.miyuki.dto.UserDTO;
 import com.miyuki.service.TripService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,8 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -36,18 +40,22 @@ public class AdminController {
     // ==================== USERS ====================
 
     @GetMapping("/users")
-    public ResponseEntity<Page<User>> getUsers(
+    public ResponseEntity<Page<UserDTO>> getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return ResponseEntity.ok(userRepository.findAll(pageable));
+        Page<User> userPage = userRepository.findAll(pageable);
+        List<UserDTO> dtos = userPage.getContent().stream()
+            .map(UserDTO::from)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(new PageImpl<>(dtos, pageable, userPage.getTotalElements()));
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(user.get());
+        return ResponseEntity.ok(UserDTO.from(user.get()));
     }
 
     @PutMapping("/users/{id}/status")
@@ -58,7 +66,7 @@ public class AdminController {
         try {
             user.setStatus(User.UserStatus.valueOf(body.get("status")));
             userRepository.save(user);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(UserDTO.from(user));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid status"));
         }

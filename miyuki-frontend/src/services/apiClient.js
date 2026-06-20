@@ -24,7 +24,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
-      window.location.href = '/login'
+      // Redirect về đúng trang login tùy theo context
+      const isAdmin = window.location.pathname.startsWith('/admin')
+      window.location.href = isAdmin ? '/admin/login' : '/login'
     }
     return Promise.reject(error)
   }

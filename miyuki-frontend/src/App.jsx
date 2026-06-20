@@ -20,14 +20,27 @@ import AdminRefunds from './pages/admin/AdminRefunds'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 
 function ProtectedRoute({ children }) {
-  const { token } = useAuth()
+  const { token, loading } = useAuth()
+  if (loading) return null
   return token ? children : <Navigate to="/login" replace />
 }
 
 // Chỉ cho phép user có role ADMIN vào, redirect về /admin/login nếu không đủ quyền
 function AdminRoute({ children }) {
-  const { token, isAdmin } = useAuth()
+  const { token, isAdmin, loading } = useAuth()
   const location = useLocation()
+
+  // Đang verify token — chờ, không redirect vội
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0D1B2A' }}>
+        <div style={{ textAlign: 'center', color: '#B0A0CC' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🌸</div>
+          <div style={{ fontSize: '0.9rem' }}>Đang xác thực...</div>
+        </div>
+      </div>
+    )
+  }
   if (!token) {
     return <Navigate to={`/admin/login?from=${encodeURIComponent(location.pathname)}`} replace />
   }
