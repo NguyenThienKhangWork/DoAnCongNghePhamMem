@@ -123,20 +123,23 @@ export default function LandingPage() {
               <input type="date" value={form.date} min={new Date().toISOString().split('T')[0]} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required />
             </Field>
           </div>
-          {/* Row 2 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          {/* Row 2 — disabled, sắp ra mắt */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem', marginTop: '1rem', opacity: 0.5 }}>
             <Field label="👥 Số hành khách">
-              <select><option>1 hành khách</option><option>2 hành khách</option><option>3 hành khách</option><option>4+ hành khách</option></select>
+              <select disabled title="Sắp ra mắt"><option>1 hành khách</option></select>
             </Field>
             <Field label="🪑 Loại ghế">
-              <select><option>Tất cả loại xe</option><option>Ghế ngồi thường</option><option>Ghế ngồi VIP</option><option>Giường nằm</option><option>Limousine</option></select>
+              <select disabled title="Sắp ra mắt"><option>Tất cả loại xe</option></select>
             </Field>
             <Field label="⏰ Giờ khởi hành">
-              <select><option>Tất cả giờ</option><option>Sáng (5h–12h)</option><option>Chiều (12h–17h)</option><option>Tối (17h–22h)</option><option>Đêm (22h–5h)</option></select>
+              <select disabled title="Sắp ra mắt"><option>Tất cả giờ</option></select>
             </Field>
             <Field label="💰 Khoảng giá">
-              <select><option>Tất cả mức giá</option><option>Dưới 100,000đ</option><option>100k–300k</option><option>300k–500k</option><option>Trên 500k</option></select>
+              <select disabled title="Sắp ra mắt"><option>Tất cả mức giá</option></select>
             </Field>
+          </div>
+          <div style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+            ⏳ Các bộ lọc nâng cao sẽ sớm ra mắt
           </div>
           <button type="submit" style={{ background: 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', padding: '0.75rem 2rem', borderRadius: 12, fontWeight: 800, fontSize: '1rem', cursor: 'pointer', fontFamily: 'Nunito,sans-serif', width: '100%', marginTop: '1.5rem', letterSpacing: '0.3px' }}>
             🔍 Tìm kiếm chuyến đi ngay

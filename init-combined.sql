@@ -1,8 +1,9 @@
-﻿-- MiYuki Express Database Initialization
+-- MiYuki Express Database Initialization
 -- MySQL 8.0
 
-CREATE DATABASE IF NOT EXISTS miyuki_db;
+CREATE DATABASE IF NOT EXISTS miyuki_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE miyuki_db;
+SET NAMES utf8mb4;
 
 -- ===== USERS & AUTHENTICATION =====
 CREATE TABLE users (
@@ -250,9 +251,9 @@ INSERT INTO roles (role_name, description) VALUES
 
 -- Bus Companies
 INSERT INTO bus_companies (company_name, phone, email, address, rating) VALUES
-('PhÆ°Æ¡ng Trang', '1900 1234', 'info@phuongtrang.vn', 'TP. Há»“ ChĂ­ Minh', 4.80),
-('ThĂ nh BÆ°á»Ÿi', '1900 5678', 'info@thanhbuoi.vn', 'TP. Há»“ ChĂ­ Minh', 4.70),
-('HoĂ ng Long', '1900 9012', 'info@hoanglongbus.vn', 'HĂ  Ná»™i', 4.60);
+('Phương Trang', '1900 1234', 'info@phuongtrang.vn', 'TP. Hồ Chí Minh', 4.80),
+('Thành Bưởi', '1900 5678', 'info@thanhbuoi.vn', 'TP. Hồ Chí Minh', 4.70),
+('Hoàng Long', '1900 9012', 'info@hoanglongbus.vn', 'Hà Nội', 4.60);
 
 -- Buses
 INSERT INTO buses (company_id, registration_plate, bus_name, total_seats, bus_type) VALUES
@@ -264,16 +265,16 @@ INSERT INTO buses (company_id, registration_plate, bus_name, total_seats, bus_ty
 
 -- Routes
 INSERT INTO routes (departure_city, destination_city, distance_km, estimated_hours, base_price) VALUES
-('HĂ  Ná»™i', 'TP. Há»“ ChĂ­ Minh', 1726, 30.00, 250000),
-('TP. Há»“ ChĂ­ Minh', 'HĂ  Ná»™i', 1726, 30.00, 250000),
-('HĂ  Ná»™i', 'ÄĂ  Náºµng', 764, 14.00, 180000),
-('ÄĂ  Náºµng', 'HĂ  Ná»™i', 764, 14.00, 180000),
-('TP. Há»“ ChĂ­ Minh', 'ÄĂ  Náºµng', 964, 18.00, 200000),
-('ÄĂ  Náºµng', 'TP. Há»“ ChĂ­ Minh', 964, 18.00, 200000),
-('TP. Há»“ ChĂ­ Minh', 'Cáº§n ThÆ¡', 170, 3.50, 80000),
-('Cáº§n ThÆ¡', 'TP. Há»“ ChĂ­ Minh', 170, 3.50, 80000),
-('HĂ  Ná»™i', 'Háº£i PhĂ²ng', 120, 2.50, 70000),
-('Háº£i PhĂ²ng', 'HĂ  Ná»™i', 120, 2.50, 70000);
+('Hà Nội', 'TP. Hồ Chí Minh', 1726, 30.00, 250000),
+('TP. Hồ Chí Minh', 'Hà Nội', 1726, 30.00, 250000),
+('Hà Nội', 'Đà Nẵng', 764, 14.00, 180000),
+('Đà Nẵng', 'Hà Nội', 764, 14.00, 180000),
+('TP. Hồ Chí Minh', 'Đà Nẵng', 964, 18.00, 200000),
+('Đà Nẵng', 'TP. Hồ Chí Minh', 964, 18.00, 200000),
+('TP. Hồ Chí Minh', 'Cần Thơ', 170, 3.50, 80000),
+('Cần Thơ', 'TP. Hồ Chí Minh', 170, 3.50, 80000),
+('Hà Nội', 'Hải Phòng', 120, 2.50, 70000),
+('Hải Phòng', 'Hà Nội', 120, 2.50, 70000);
 
 -- Trips (upcoming trips relative to now)
 INSERT INTO trips (route_id, bus_id, departure_time, arrival_time, price, available_seats, status) VALUES
@@ -320,15 +321,10 @@ FROM trips t
 LEFT JOIN seats s ON t.trip_id = s.trip_id
 GROUP BY t.trip_id;
 -- =====================================================
--- MiYuki Express - Dá»¯ liá»‡u thá»±c táº¿ Viá»‡t Nam
+-- MiYuki Express - Dữ liệu thực tế Việt Nam
 -- =====================================================
-USE miyuki_db;
-
-SET NAMES utf8mb4;
-SET CHARACTER SET utf8mb4;
-
 -- =====================================================
--- XĂ“A Dá»® LIá»†U CÅ¨ (giá»¯ schema)
+-- XÓA DỮ LIỆU CŨ (giữ schema)
 -- =====================================================
 SET FOREIGN_KEY_CHECKS = 0;
 DELETE FROM payments;
@@ -343,79 +339,79 @@ DELETE FROM users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================
--- USERS - TĂ i khoáº£n demo
+-- USERS - Tài khoản demo
 -- =====================================================
--- Máº­t kháº©u: Demo@123456 (BCrypt hash)
+-- Mật khẩu: Demo@123456 (BCrypt hash)
 INSERT INTO users (user_id, email, phone, full_name, password_hash, status, created_at, updated_at) VALUES
-(1,  'demo@miyuki.vn',      '0901234567', 'Nguyá»…n VÄƒn Demo',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW()),
+(1,  'demo@miyuki.vn',      '0901234567', 'Nguyễn Văn Demo',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW()),
 (2,  'admin@miyuki.vn',     '0909999888', 'Admin MiYuki',         '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW()),
-(3,  'lan.anh@gmail.com',   '0912345678', 'Nguyá»…n Thá»‹ Lan Anh',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW()),
-(4,  'minh.quan@gmail.com', '0934567890', 'Tráº§n Minh QuĂ¢n',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW()),
-(5,  'thu.huong@gmail.com', '0945678901', 'Pháº¡m Thu HÆ°Æ¡ng',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW());
+(3,  'lan.anh@gmail.com',   '0912345678', 'Nguyễn Thị Lan Anh',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW()),
+(4,  'minh.quan@gmail.com', '0934567890', 'Trần Minh Quân',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW()),
+(5,  'thu.huong@gmail.com', '0945678901', 'Phạm Thu Hương',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LkdEe9HB5HC', 'ACTIVE', NOW(), NOW());
 
 -- =====================================================
 -- ROLES
 -- =====================================================
 INSERT IGNORE INTO roles (role_id, role_name, description) VALUES
-(1, 'CUSTOMER', 'KhĂ¡ch hĂ ng thĂ´ng thÆ°á»ng'),
-(2, 'DRIVER',   'TĂ i xáº¿ xe khĂ¡ch'),
-(3, 'COMPANY_ADMIN', 'Quáº£n trá»‹ nhĂ  xe'),
-(4, 'ADMIN',    'Quáº£n trá»‹ há»‡ thá»‘ng');
+(1, 'CUSTOMER', 'Khách hàng thông thường'),
+(2, 'DRIVER',   'Tài xế xe khách'),
+(3, 'COMPANY_ADMIN', 'Quản trị nhà xe'),
+(4, 'ADMIN',    'Quản trị hệ thống');
 
 INSERT INTO user_roles (user_id, role_id) VALUES
 (1, 1), (2, 4), (3, 1), (4, 1), (5, 1);
 
 -- =====================================================
--- NHĂ€ XE - Thá»±c táº¿ Viá»‡t Nam
+-- NHÀ XE - Thực tế Việt Nam
 -- =====================================================
 INSERT INTO bus_companies (company_id, company_name, phone, email, address, rating, status, created_at, updated_at) VALUES
-(1, 'PhÆ°Æ¡ng Trang (FUTA)',  '1900 6067', 'info@futabus.vn',        '467 LĂª Há»“ng Phong, Quáº­n 10, TP.HCM', 4.85, 'ACTIVE', NOW(), NOW()),
-(2, 'ThĂ nh BÆ°á»Ÿi',          '028 3838 3838', 'info@thanhbuoi.vn',   '265 Äiá»‡n BiĂªn Phá»§, Quáº­n 3, TP.HCM',  4.72, 'ACTIVE', NOW(), NOW()),
-(3, 'HoĂ ng Long',          '024 3829 3029', 'info@hoanglongbus.vn','74B Tráº§n NhĂ¢n TĂ´ng, HĂ  Ná»™i',          4.68, 'ACTIVE', NOW(), NOW()),
-(4, 'HĂ  SÆ¡n - Háº£i VĂ¢n',   '024 3267 3267', 'info@hasonhaivan.vn', '149 Giáº£ng VĂµ, Ba ÄĂ¬nh, HĂ  Ná»™i',       4.55, 'ACTIVE', NOW(), NOW()),
-(5, 'Kumho Samco',         '028 3932 9292', 'info@kumhosamco.vn',  '37 HĂ¹ng VÆ°Æ¡ng, Quáº­n 5, TP.HCM',       4.60, 'ACTIVE', NOW(), NOW()),
-(6, 'Sinh Tourist',        '1900 1838',     'info@thesinhtourist.vn','246-248 De Tham, Quáº­n 1, TP.HCM',   4.50, 'ACTIVE', NOW(), NOW()),
-(7, 'Mai Linh Express',    '1900 6267',     'info@mailinh.vn',      'ToĂ n quá»‘c',                           4.45, 'ACTIVE', NOW(), NOW()),
-(8, 'Xe khĂ¡ch SĂ i GĂ²n',   '028 3845 6789', 'info@saigonbus.vn',   '389 Äinh TiĂªn HoĂ ng, Q.BĂ¬nh Tháº¡nh',   4.40, 'ACTIVE', NOW(), NOW());
+(1, 'Phương Trang (FUTA)',  '1900 6067', 'info@futabus.vn',        '467 Lê Hồng Phong, Quận 10, TP.HCM', 4.85, 'ACTIVE', NOW(), NOW()),
+(2, 'Thành Bưởi',          '028 3838 3838', 'info@thanhbuoi.vn',   '265 Điện Biên Phủ, Quận 3, TP.HCM',  4.72, 'ACTIVE', NOW(), NOW()),
+(3, 'Hoàng Long',          '024 3829 3029', 'info@hoanglongbus.vn','74B Trần Nhân Tông, Hà Nội',          4.68, 'ACTIVE', NOW(), NOW()),
+(4, 'Hà Sơn - Hải Vân',   '024 3267 3267', 'info@hasonhaivan.vn', '149 Giảng Võ, Ba Đình, Hà Nội',       4.55, 'ACTIVE', NOW(), NOW()),
+(5, 'Kumho Samco',         '028 3932 9292', 'info@kumhosamco.vn',  '37 Hùng Vương, Quận 5, TP.HCM',       4.60, 'ACTIVE', NOW(), NOW()),
+(6, 'Sinh Tourist',        '1900 1838',     'info@thesinhtourist.vn','246-248 De Tham, Quận 1, TP.HCM',   4.50, 'ACTIVE', NOW(), NOW()),
+(7, 'Mai Linh Express',    '1900 6267',     'info@mailinh.vn',      'Toàn quốc',                           4.45, 'ACTIVE', NOW(), NOW()),
+(8, 'Xe khách Sài Gòn',   '028 3845 6789', 'info@saigonbus.vn',   '389 Đinh Tiên Hoàng, Q.Bình Thạnh',   4.40, 'ACTIVE', NOW(), NOW());
 
 -- =====================================================
--- XE KHĂCH - Äáº§u xe thá»±c táº¿
+-- XE KHÁCH - Đầu xe thực tế
 -- =====================================================
 INSERT INTO buses (bus_id, company_id, registration_plate, bus_name, total_seats, bus_type, year_manufactured, status, created_at, updated_at) VALUES
--- PhÆ°Æ¡ng Trang
-(1,  1, '51B-333.33', 'PhÆ°Æ¡ng Trang - Gháº¿ 45',     45, 'SEAT',      2022, 'ACTIVE', NOW(), NOW()),
-(2,  1, '51B-444.44', 'PhÆ°Æ¡ng Trang - GiÆ°á»ng 40',   40, 'SLEEPER',   2023, 'ACTIVE', NOW(), NOW()),
-(3,  1, '51B-555.55', 'PhÆ°Æ¡ng Trang Limousine VIP',  22, 'LIMOUSINE', 2024, 'ACTIVE', NOW(), NOW()),
-(4,  1, '51B-666.66', 'PhÆ°Æ¡ng Trang - GiÆ°á»ng 34',   34, 'SLEEPER',   2022, 'ACTIVE', NOW(), NOW()),
--- ThĂ nh BÆ°á»Ÿi
-(5,  2, '51C-111.11', 'ThĂ nh BÆ°á»Ÿi Gháº¿ VIP',        45, 'SEAT',      2022, 'ACTIVE', NOW(), NOW()),
-(6,  2, '51C-222.22', 'ThĂ nh BÆ°á»Ÿi Limousine 22',    22, 'LIMOUSINE', 2023, 'ACTIVE', NOW(), NOW()),
-(7,  2, '51C-333.33', 'ThĂ nh BÆ°á»Ÿi GiÆ°á»ng Ä‘Ă´i',      36, 'SLEEPER',   2021, 'ACTIVE', NOW(), NOW()),
--- HoĂ ng Long
-(8,  3, '29B-111.11', 'HoĂ ng Long Express 45',      45, 'SEAT',      2022, 'ACTIVE', NOW(), NOW()),
-(9,  3, '29B-222.22', 'HoĂ ng Long GiÆ°á»ng náº±m',      40, 'SLEEPER',   2023, 'ACTIVE', NOW(), NOW()),
-(10, 3, '29B-333.33', 'HoĂ ng Long Limousine',       18, 'LIMOUSINE', 2024, 'ACTIVE', NOW(), NOW()),
--- HĂ  SÆ¡n - Háº£i VĂ¢n
-(11, 4, '30A-111.11', 'HĂ  SÆ¡n Gháº¿ ngá»“i',           45, 'SEAT',      2021, 'ACTIVE', NOW(), NOW()),
-(12, 4, '30A-222.22', 'HĂ  SÆ¡n GiÆ°á»ng náº±m',          36, 'SLEEPER',   2022, 'ACTIVE', NOW(), NOW()),
+-- Phương Trang
+(1,  1, '51B-333.33', 'Phương Trang - Ghế 45',     45, 'SEAT',      2022, 'ACTIVE', NOW(), NOW()),
+(2,  1, '51B-444.44', 'Phương Trang - Giường 40',   40, 'SLEEPER',   2023, 'ACTIVE', NOW(), NOW()),
+(3,  1, '51B-555.55', 'Phương Trang Limousine VIP',  22, 'LIMOUSINE', 2024, 'ACTIVE', NOW(), NOW()),
+(4,  1, '51B-666.66', 'Phương Trang - Giường 34',   34, 'SLEEPER',   2022, 'ACTIVE', NOW(), NOW()),
+-- Thành Bưởi
+(5,  2, '51C-111.11', 'Thành Bưởi Ghế VIP',        45, 'SEAT',      2022, 'ACTIVE', NOW(), NOW()),
+(6,  2, '51C-222.22', 'Thành Bưởi Limousine 22',    22, 'LIMOUSINE', 2023, 'ACTIVE', NOW(), NOW()),
+(7,  2, '51C-333.33', 'Thành Bưởi Giường Đôi',      36, 'SLEEPER',   2021, 'ACTIVE', NOW(), NOW()),
+-- Hoàng Long
+(8,  3, '29B-111.11', 'Hoàng Long Express 45',      45, 'SEAT',      2022, 'ACTIVE', NOW(), NOW()),
+(9,  3, '29B-222.22', 'Hoàng Long Giường nằm',      40, 'SLEEPER',   2023, 'ACTIVE', NOW(), NOW()),
+(10, 3, '29B-333.33', 'Hoàng Long Limousine',       18, 'LIMOUSINE', 2024, 'ACTIVE', NOW(), NOW()),
+-- Hà Sơn - Hải Vân
+(11, 4, '30A-111.11', 'Hà Sơn Ghế ngồi',           45, 'SEAT',      2021, 'ACTIVE', NOW(), NOW()),
+(12, 4, '30A-222.22', 'Hà Sơn Giường nằm',          36, 'SLEEPER',   2022, 'ACTIVE', NOW(), NOW()),
 -- Kumho Samco
-(13, 5, '51D-111.11', 'Kumho GiÆ°á»ng Ä‘Æ¡n',           36, 'SLEEPER',   2023, 'ACTIVE', NOW(), NOW()),
+(13, 5, '51D-111.11', 'Kumho Giường đơn',           36, 'SLEEPER',   2023, 'ACTIVE', NOW(), NOW()),
 (14, 5, '51D-222.22', 'Kumho Limousine VIP',         22, 'LIMOUSINE', 2024, 'ACTIVE', NOW(), NOW()),
 -- Sinh Tourist
 (15, 6, '51E-111.11', 'Sinh Tourist Sleeper',       40, 'SLEEPER',   2022, 'ACTIVE', NOW(), NOW()),
 (16, 6, '51E-222.22', 'Sinh Tourist VIP',           22, 'LIMOUSINE', 2023, 'ACTIVE', NOW(), NOW()),
--- Mai Linh & SĂ i GĂ²n
+-- Mai Linh & Sài Gòn
 (17, 7, '51G-111.11', 'Mai Linh Express',           45, 'SEAT',      2021, 'ACTIVE', NOW(), NOW()),
-(18, 8, '51H-111.11', 'SĂ i GĂ²n GiÆ°á»ng náº±m',        40, 'SLEEPER',   2022, 'ACTIVE', NOW(), NOW());
+(18, 8, '51H-111.11', 'Sài Gòn Giường nằm',        40, 'SLEEPER',   2022, 'ACTIVE', NOW(), NOW());
 
 -- =====================================================
--- TUYáº¾N ÄÆ¯á»œNG - Thá»±c táº¿ Viá»‡t Nam
+-- TUYẾN ĐƯỜNG - Thực tế Việt Nam
 -- =====================================================
 INSERT INTO routes (route_id, departure_city, destination_city, distance_km, estimated_hours, base_price, status, created_at) VALUES
--- Báº¯c - Nam
+-- Bắc - Nam
 (1,  'Ha Noi',       'TP. Ho Chi Minh', 1726, 32.00, 350000, 'ACTIVE', NOW()),
 (2,  'TP. Ho Chi Minh', 'Ha Noi',       1726, 32.00, 350000, 'ACTIVE', NOW()),
--- Miá»n Báº¯c
+-- Miền Bắc
 (3,  'Ha Noi',       'Da Nang',         763,  14.00, 220000, 'ACTIVE', NOW()),
 (4,  'Da Nang',      'Ha Noi',          763,  14.00, 220000, 'ACTIVE', NOW()),
 (5,  'Ha Noi',       'Hai Phong',       120,  2.50,  70000,  'ACTIVE', NOW()),
@@ -424,7 +420,7 @@ INSERT INTO routes (route_id, departure_city, destination_city, distance_km, est
 (8,  'Ha Noi',       'Sa Pa',           380,  6.00,  150000, 'ACTIVE', NOW()),
 (9,  'Ha Noi',       'Ha Long',         170,  3.50,  100000, 'ACTIVE', NOW()),
 (10, 'Ha Long',      'Ha Noi',          170,  3.50,  100000, 'ACTIVE', NOW()),
--- Miá»n Trung
+-- Miền Trung
 (11, 'Da Nang',      'Hue',             100,  2.50,  80000,  'ACTIVE', NOW()),
 (12, 'Hue',          'Da Nang',         100,  2.50,  80000,  'ACTIVE', NOW()),
 (13, 'Da Nang',      'Hoi An',          30,   1.00,  35000,  'ACTIVE', NOW()),
@@ -434,7 +430,7 @@ INSERT INTO routes (route_id, departure_city, destination_city, distance_km, est
 (17, 'Hue',          'TP. Ho Chi Minh', 1064, 18.00, 300000, 'ACTIVE', NOW()),
 (18, 'Da Nang',      'Quy Nhon',        305,  6.00,  150000, 'ACTIVE', NOW()),
 (19, 'Da Nang',      'Nha Trang',       530,  9.00,  200000, 'ACTIVE', NOW()),
--- Miá»n Nam
+-- Miền Nam
 (20, 'TP. Ho Chi Minh', 'Vung Tau',     125,  2.50,  90000,  'ACTIVE', NOW()),
 (21, 'Vung Tau',     'TP. Ho Chi Minh', 125,  2.50,  90000,  'ACTIVE', NOW()),
 (22, 'TP. Ho Chi Minh', 'Can Tho',      170,  3.50,  100000, 'ACTIVE', NOW()),
@@ -448,107 +444,107 @@ INSERT INTO routes (route_id, departure_city, destination_city, distance_km, est
 (30, 'TP. Ho Chi Minh', 'Tay Ninh',     100,  2.50,  65000,  'ACTIVE', NOW());
 
 -- =====================================================
--- CHUYáº¾N ÄI - Trong 3 ngĂ y tá»›i (thá»±c táº¿)
+-- CHUYẾN ĐI - Trong 3 ngày tới (thực tế)
 -- =====================================================
 INSERT INTO trips (route_id, bus_id, departure_time, arrival_time, price, available_seats, status, created_at, updated_at) VALUES
 
--- HĂ€ Ná»˜I â†’ TP. HCM (route 1)
+-- HÀ NỘI → TP. HCM (route 1)
 (1, 2,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 6 HOUR,   DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 14 HOUR, 380000, 28, 'SCHEDULED', NOW(), NOW()),
 (1, 4,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 18 HOUR,  DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 2 HOUR,  420000, 20, 'SCHEDULED', NOW(), NOW()),
 (1, 3,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 7 HOUR,   DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 15 HOUR, 650000, 12, 'SCHEDULED', NOW(), NOW()),
 (1, 9,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 19 HOUR,  DATE_ADD(CURDATE(), INTERVAL 4 DAY) + INTERVAL 3 HOUR,  390000, 32, 'SCHEDULED', NOW(), NOW()),
 (1, 2,  DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 6 HOUR,   DATE_ADD(CURDATE(), INTERVAL 5 DAY) + INTERVAL 14 HOUR, 380000, 36, 'SCHEDULED', NOW(), NOW()),
 
--- TP. HCM â†’ HĂ€ Ná»˜I (route 2)
+-- TP. HCM → HÀ NỘI (route 2)
 (2, 7,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR,   DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 16 HOUR, 370000, 24, 'SCHEDULED', NOW(), NOW()),
 (2, 15, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 19 HOUR,  DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 3 HOUR,  400000, 30, 'SCHEDULED', NOW(), NOW()),
 (2, 6,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 9 HOUR,   DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 17 HOUR, 680000, 10, 'SCHEDULED', NOW(), NOW()),
 
--- HĂ€ Ná»˜I â†’ ÄĂ€ Náº´NG (route 3)
+-- HÀ NỘI → ĐÀ NẴNG (route 3)
 (3, 8,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,   DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 21 HOUR, 230000, 38, 'SCHEDULED', NOW(), NOW()),
 (3, 9,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 18 HOUR,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 8 HOUR,  250000, 28, 'SCHEDULED', NOW(), NOW()),
 (3, 10, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 8 HOUR,   DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 22 HOUR, 450000, 12, 'SCHEDULED', NOW(), NOW()),
 (3, 12, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 19 HOUR,  DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 9 HOUR,  260000, 22, 'SCHEDULED', NOW(), NOW()),
 
--- ÄĂ€ Náº´NG â†’ HĂ€ Ná»˜I (route 4)
+-- ĐÀ NẴNG → HÀ NỘI (route 4)
 (4, 11, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,   DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 21 HOUR, 225000, 40, 'SCHEDULED', NOW(), NOW()),
 (4, 12, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 20 HOUR,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 10 HOUR, 255000, 26, 'SCHEDULED', NOW(), NOW()),
 
--- HĂ€ Ná»˜I â†’ Háº¢I PHĂ’NG (route 5) - ngáº¯n, nhiá»u chuyáº¿n
+-- HÀ NỘI → HẢI PHÒNG (route 5) - ngắn, nhiều chuyến
 (5, 1,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 6 HOUR,   DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR + INTERVAL 30 MINUTE, 75000, 42, 'SCHEDULED', NOW(), NOW()),
 (5, 8,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 9 HOUR,   DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 11 HOUR + INTERVAL 30 MINUTE, 75000, 40, 'SCHEDULED', NOW(), NOW()),
 (5, 11, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 13 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 15 HOUR + INTERVAL 30 MINUTE, 75000, 38, 'SCHEDULED', NOW(), NOW()),
 (5, 17, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 17 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 19 HOUR + INTERVAL 30 MINUTE, 75000, 44, 'SCHEDULED', NOW(), NOW()),
 
--- HĂ€ Ná»˜I â†’ Háº  LONG (route 9)
+-- HÀ NỘI → HẠ LONG (route 9)
 (9, 1,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,   DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 10 HOUR + INTERVAL 30 MINUTE, 110000, 40, 'SCHEDULED', NOW(), NOW()),
 (9, 8,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR,   DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 11 HOUR + INTERVAL 30 MINUTE, 110000, 38, 'SCHEDULED', NOW(), NOW()),
 (9, 11, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 7 HOUR,   DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 10 HOUR + INTERVAL 30 MINUTE, 115000, 36, 'SCHEDULED', NOW(), NOW()),
 
--- ÄĂ€ Náº´NG â†’ HUáº¾ (route 11)
+-- ĐÀ NẴNG → HUẾ (route 11)
 (11, 17, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 9 HOUR + INTERVAL 30 MINUTE, 85000, 42, 'SCHEDULED', NOW(), NOW()),
 (11, 1,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 10 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 12 HOUR + INTERVAL 30 MINUTE, 85000, 40, 'SCHEDULED', NOW(), NOW()),
 (11, 8,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 14 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 16 HOUR + INTERVAL 30 MINUTE, 90000, 38, 'SCHEDULED', NOW(), NOW()),
 
--- ÄĂ€ Náº´NG â†’ Há»˜I AN (route 13) - ráº¥t nhiá»u chuyáº¿n
+-- ĐÀ NẴNG → HỘI AN (route 13) - rất nhiều chuyến
 (13, 17, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 6 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,  40000, 44, 'SCHEDULED', NOW(), NOW()),
 (13, 1,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 9 HOUR,  40000, 42, 'SCHEDULED', NOW(), NOW()),
 (13, 8,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 10 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 11 HOUR, 40000, 40, 'SCHEDULED', NOW(), NOW()),
 
--- TP. HCM â†’ VÅ¨NG TĂ€U (route 20)
+-- TP. HCM → VŨNG TÀU (route 20)
 (20, 5,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 6 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR + INTERVAL 30 MINUTE, 95000, 43, 'SCHEDULED', NOW(), NOW()),
 (20, 1,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 9 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 11 HOUR + INTERVAL 30 MINUTE, 95000, 40, 'SCHEDULED', NOW(), NOW()),
 (20, 17, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 12 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 14 HOUR + INTERVAL 30 MINUTE, 95000, 38, 'SCHEDULED', NOW(), NOW()),
 (20, 5,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 15 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 17 HOUR + INTERVAL 30 MINUTE, 95000, 35, 'SCHEDULED', NOW(), NOW()),
 (20, 8,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 6 HOUR,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 8 HOUR + INTERVAL 30 MINUTE, 95000, 42, 'SCHEDULED', NOW(), NOW()),
 
--- TP. HCM â†’ Cáº¦N THÆ  (route 22)
+-- TP. HCM → CẦN THƠ (route 22)
 (22, 5,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 6 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 9 HOUR + INTERVAL 30 MINUTE, 105000, 42, 'SCHEDULED', NOW(), NOW()),
 (22, 18, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 9 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 12 HOUR + INTERVAL 30 MINUTE, 115000, 28, 'SCHEDULED', NOW(), NOW()),
 (22, 7,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 13 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 16 HOUR + INTERVAL 30 MINUTE, 105000, 34, 'SCHEDULED', NOW(), NOW()),
 (22, 5,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 16 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 19 HOUR + INTERVAL 30 MINUTE, 105000, 38, 'SCHEDULED', NOW(), NOW()),
 (22, 6,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 7 HOUR,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 10 HOUR + INTERVAL 30 MINUTE, 195000, 14, 'SCHEDULED', NOW(), NOW()),
 
--- TP. HCM â†’ ÄĂ€ Láº T (route 24)
+-- TP. HCM → ĐÀ LẠT (route 24)
 (24, 5,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 14 HOUR, 165000, 40, 'SCHEDULED', NOW(), NOW()),
 (24, 7,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 19 HOUR, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 2 HOUR,  185000, 30, 'SCHEDULED', NOW(), NOW()),
 (24, 6,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 7 HOUR,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 14 HOUR, 380000, 16, 'SCHEDULED', NOW(), NOW()),
 (24, 18, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 20 HOUR, DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 3 HOUR,  175000, 28, 'SCHEDULED', NOW(), NOW()),
 (24, 15, DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 8 HOUR,  DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 15 HOUR, 185000, 32, 'SCHEDULED', NOW(), NOW()),
 
--- TP. HCM â†’ NHA TRANG (route 26)
+-- TP. HCM → NHA TRANG (route 26)
 (26, 7,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 16 HOUR, 230000, 28, 'SCHEDULED', NOW(), NOW()),
 (26, 14, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 19 HOUR, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 4 HOUR,  450000, 16, 'SCHEDULED', NOW(), NOW()),
 (26, 18, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 8 HOUR,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 17 HOUR, 235000, 32, 'SCHEDULED', NOW(), NOW()),
 (26, 15, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 20 HOUR, DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 5 HOUR,  250000, 24, 'SCHEDULED', NOW(), NOW()),
 
--- TP. HCM â†’ PHAN THIáº¾T (route 28)
+-- TP. HCM → PHAN THIẾT (route 28)
 (28, 5,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 11 HOUR, 130000, 40, 'SCHEDULED', NOW(), NOW()),
 (28, 17, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 10 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 14 HOUR, 130000, 38, 'SCHEDULED', NOW(), NOW()),
 (28, 1,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 14 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 18 HOUR, 130000, 42, 'SCHEDULED', NOW(), NOW()),
 
--- ÄĂ€ Náº´NG â†’ NHA TRANG (route 19)
+-- ĐÀ NẴNG → NHA TRANG (route 19)
 (19, 8,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 16 HOUR, 210000, 38, 'SCHEDULED', NOW(), NOW()),
 (19, 9,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 19 HOUR, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 4 HOUR,  225000, 28, 'SCHEDULED', NOW(), NOW()),
 
--- HĂ€ Ná»˜I â†’ SA PA (route 8)
+-- HÀ NỘI → SA PA (route 8)
 (8, 9,   DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 21 HOUR, DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 3 HOUR,  175000, 36, 'SCHEDULED', NOW(), NOW()),
 (8, 12,  DATE_ADD(CURDATE(), INTERVAL 2 DAY) + INTERVAL 22 HOUR, DATE_ADD(CURDATE(), INTERVAL 3 DAY) + INTERVAL 4 HOUR,  185000, 28, 'SCHEDULED', NOW(), NOW()),
 
--- TP. HCM â†’ TĂ‚Y NINH (route 30)
+-- TP. HCM → TÂY NINH (route 30)
 (30, 17, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 6 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR + INTERVAL 30 MINUTE, 70000, 44, 'SCHEDULED', NOW(), NOW()),
 (30, 1,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 10 HOUR + INTERVAL 30 MINUTE, 70000, 42, 'SCHEDULED', NOW(), NOW()),
 (30, 5,  DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 11 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 13 HOUR + INTERVAL 30 MINUTE, 70000, 40, 'SCHEDULED', NOW(), NOW()),
 (30, 17, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 15 HOUR, DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 17 HOUR + INTERVAL 30 MINUTE, 70000, 38, 'SCHEDULED', NOW(), NOW());
 
-SELECT CONCAT('âœ… ÄĂ£ thĂªm dá»¯ liá»‡u: ', COUNT(*), ' chuyáº¿n Ä‘i') as result FROM trips;
-SELECT CONCAT('âœ… Routes: ', COUNT(*), ' tuyáº¿n Ä‘Æ°á»ng') as result FROM routes;
-SELECT CONCAT('âœ… Users: ', COUNT(*), ' tĂ i khoáº£n') as result FROM users;
+SELECT CONCAT('✅ Đã thêm dữ liệu: ', COUNT(*), ' chuyến đi') as result FROM trips;
+SELECT CONCAT('✅ Routes: ', COUNT(*), ' tuyến đường') as result FROM routes;
+SELECT CONCAT('✅ Users: ', COUNT(*), ' tài khoản') as result FROM users;
 USE miyuki_db;
 SET NAMES utf8mb4;
 
--- Táº¡o gháº¿ cho táº¥t cáº£ trips hiá»‡n cĂ³
--- Má»—i trip: táº¡o gháº¿ theo total_seats cá»§a bus
+-- Tạo ghế cho tất cả trips hiện có
+-- Mỗi trip: tạo ghế theo total_seats của bus
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS create_seats_for_trips//
@@ -579,13 +575,13 @@ BEGIN
         
         SET i = 1;
         WHILE i <= v_total_seats DO
-            -- Táº¡o sá»‘ gháº¿: A1-A4, B1-B4, ...
+            -- Tạo số ghế: A1-A4, B1-B4, ...
             SET seat_label = CONCAT(
                 CHAR(64 + CEIL(i/4)),
                 ((i-1) MOD 4) + 1
             );
             
-            -- Loáº¡i gháº¿ dá»±a vĂ o bus type vĂ  vá»‹ trĂ­
+            -- Loại ghế dựa vào bus type và vị trí
             IF v_bus_type = 'LIMOUSINE' THEN
                 SET seat_type = 'VIP';
             ELSEIF v_bus_type = 'SLEEPER' THEN
@@ -613,16 +609,39 @@ CALL create_seats_for_trips();
 SELECT CONCAT('Tong so ghe da tao: ', COUNT(*)) as result FROM seats;
 SELECT trip_id, COUNT(*) as seat_count FROM seats GROUP BY trip_id ORDER BY trip_id LIMIT 5;
 -- =================================================================
--- MiYuki Express - Dá»¯ liá»‡u áº£o: booking_details, reviews,
+-- MiYuki Express - Dữ liệu ảo: booking_details, reviews,
 --                               notifications, refunds
---                 + 63 tá»‰nh thĂ nh Viá»‡t Nam (routes + trips)
+--                 + 63 tỉnh thành Việt Nam (routes + trips)
 -- =================================================================
 USE miyuki_db;
 SET NAMES utf8mb4;
 SET foreign_key_checks = 0;
 
 -- =================================================================
--- 1. BOOKING DETAILS (hĂ nh khĂ¡ch cho tá»«ng gháº¿)
+-- 0. BOOKINGS (dữ liệu đặt vé - chèn trước booking_details)
+-- =================================================================
+-- booking 2: lan.anh (user 3), trip 45 (HCM→NhaTrang, 250k), 2 ghế = 500k, chưa TT
+-- booking 3: lan.anh (user 3), trip 25 (DN→HoiAn, 40k), 1 ghế = 40k, chưa TT (đã hoàn tiền)
+-- booking 4: minh.quan (user 4), trip 10 (HN→DN, 250k), 2 ghế = 500k, đã TT
+-- booking 5: thu.huong (user 5), trip 28 (HCM→VungTau, 95k), 3 ghế = 285k, đã TT
+-- booking 6: lan.anh (user 3), trip 48 (HCM→PhanThiet, 130k), 1 ghế = 130k, đã TT
+-- booking 7: demo (user 1), trip 22 (DN→Hue, 90k), 2 ghế = 180k, chưa TT (chờ hoàn tiền)
+-- booking 8: demo (user 1), trip 35 (HCM→CanTho, 105k), 1 ghế = 105k, chưa TT
+-- booking 9: admin (user 2), trip 9 (HN→DN, 230k), 1 ghế = 230k, đã TT
+INSERT INTO bookings
+  (booking_id, user_id, trip_id, booking_code, booking_status, total_price, payment_status, departure_date, created_at, updated_at)
+VALUES
+(2, 3, 45, 'MKE05E3AD6',  'PENDING',   500000.00, 'UNPAID',   DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW()),
+(3, 3, 25, 'MK218A6896',  'CANCELLED', 40000.00,  'REFUNDED', DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW()),
+(4, 4, 10, 'MKFEB1A535',  'CONFIRMED', 500000.00, 'PAID',     DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW()),
+(5, 5, 28, 'MK693589B3',  'CONFIRMED', 285000.00, 'PAID',     DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW()),
+(6, 3, 48, 'MKDC151A85',  'CONFIRMED', 130000.00, 'PAID',     DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW()),
+(7, 1, 22, 'MKD4CEB470',  'PENDING',   180000.00, 'UNPAID',   DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW()),
+(8, 1, 35, 'MK8F3A2B1C',  'PENDING',   105000.00, 'UNPAID',   DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW()),
+(9, 2, 9,  'MK9D4E5F6A',  'CONFIRMED', 230000.00, 'PAID',     DATE_ADD(CURDATE(), INTERVAL 1 DAY), NOW(), NOW());
+
+-- =================================================================
+-- 1. BOOKING DETAILS (hành khách cho từng ghế)
 -- =================================================================
 -- booking 2: lan.anh, trip 45, seats 632(A1) 633(A2)
 INSERT IGNORE INTO booking_details
@@ -650,133 +669,133 @@ VALUES
 (9, 431, 'Admin MiYuki',       '0909999888', 'admin@miyuki.vn',   '001100088888');
 
 -- =================================================================
--- 2. REVIEWS (Ä‘Ă¡nh giĂ¡ sau chuyáº¿n Ä‘i)
+-- 2. REVIEWS (đánh giá sau chuyến đi)
 -- =================================================================
 INSERT IGNORE INTO reviews
   (booking_id, user_id, trip_id, rating, comment)
 VALUES
--- lan.anh Ä‘Ă¡nh giĂ¡ chuyáº¿n HCM->DaLat (booking 2, trip 45)
+-- lan.anh đánh giá chuyến HCM->DaLat (booking 2, trip 45)
 (2, 3, 45, 5,
- 'Xe cháº¡y Ä‘Ăºng giá», tĂ i xáº¿ lĂ¡i ráº¥t chuyĂªn nghiá»‡p. Gháº¿ ngá»“i thoáº£i mĂ¡i, Ä‘iá»u hĂ²a mĂ¡t. Sáº½ Ä‘áº·t láº¡i láº§n sau!'),
+ 'Xe chạy đúng giờ, tài xế lái rất chuyên nghiệp. Ghế ngồi thoải mái, điều hòa mát. Sẽ đặt lại lần sau!'),
 
--- lan.anh Ä‘Ă¡nh giĂ¡ chuyáº¿n HCM->NhaTrang (booking 6, trip 48)
+-- lan.anh đánh giá chuyến HCM->NhaTrang (booking 6, trip 48)
 (6, 3, 48, 4,
- 'Chuyáº¿n Ä‘i á»•n, xe sáº¡ch sáº½. Chá»‰ hÆ¡i trá»… 15 phĂºt so vá»›i lá»‹ch nhÆ°ng khĂ´ng sao. NhĂ¢n viĂªn thĂ¢n thiá»‡n.'),
+ 'Chuyến đi ổn, xe sạch sẽ. Chỉ hơi trễ 15 phút so với lịch nhưng không sao. Nhân viên thân thiện.'),
 
--- minh.quan Ä‘Ă¡nh giĂ¡ chuyáº¿n HN->DaNang (booking 4, trip 10)
+-- minh.quan đánh giá chuyến HN->DaNang (booking 4, trip 10)
 (4, 4, 10, 5,
- 'Äáº·t vĂ© qua MiYuki ráº¥t tiá»‡n lá»£i, khĂ´ng cáº§n ra báº¿n xe. Xe giÆ°á»ng náº±m ráº¥t Ăªm, ngá»§ ngon suá»‘t chuyáº¿n!'),
+ 'Đặt vé qua MiYuki rất tiện lợi, không cần ra bến xe. Xe giường nằm rất êm, ngủ ngon suốt chuyến!'),
 
--- thu.huong Ä‘Ă¡nh giĂ¡ chuyáº¿n HCM->VungTau (booking 5, trip 28)
+-- thu.huong đánh giá chuyến HCM->VungTau (booking 5, trip 28)
 (5, 5, 28, 4,
- 'Tuyáº¿n HCM - VÅ©ng TĂ u tiá»‡n lá»£i, xe Ä‘Ă´ng nhÆ°ng váº«n cĂ³ gháº¿. Chá»‰ cáº§n cáº£i thiá»‡n viá»‡c Ä‘Ă³n khĂ¡ch Ä‘Ăºng Ä‘iá»ƒm hÆ¡n.');
+ 'Tuyến HCM - Vũng Tàu tiện lợi, xe đông nhưng vẫn có ghế. Chỉ cần cải thiện việc đón khách đúng điểm hơn.');
 
 -- =================================================================
--- 3. NOTIFICATIONS (thĂ´ng bĂ¡o há»‡ thá»‘ng)
+-- 3. NOTIFICATIONS (thông báo hệ thống)
 -- =================================================================
 INSERT INTO notifications
   (user_id, booking_id, notification_type, title, message, is_read)
 VALUES
--- XĂ¡c nháº­n vĂ©
+-- Xác nhận vé
 (3, 2, 'BOOKING_CONFIRMED',
- 'VĂ© Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n',
- 'VĂ© MKE05E3AD6 cá»§a báº¡n Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n. Chuyáº¿n TP. HCM â†’ ÄĂ  Láº¡t khá»Ÿi hĂ nh lĂºc 07:00 ngĂ y mai.',
+ 'Vé đã được xác nhận',
+ 'Vé MKE05E3AD6 của bạn đã được xác nhận. Chuyến TP. HCM → Đà Lạt khởi hành lúc 07:00 ngày mai.',
  TRUE),
 
 (3, 6, 'BOOKING_CONFIRMED',
- 'VĂ© Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n',
- 'VĂ© MKDC151A85 cá»§a báº¡n Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n. Chuyáº¿n TP. HCM â†’ Nha Trang khá»Ÿi hĂ nh tá»‘i mai.',
+ 'Vé đã được xác nhận',
+ 'Vé MKDC151A85 của bạn đã được xác nhận. Chuyến TP. HCM → Nha Trang khởi hành tối mai.',
  TRUE),
 
 (4, 4, 'BOOKING_CONFIRMED',
- 'VĂ© Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n',
- 'VĂ© MKFEB1A535 cá»§a báº¡n Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n. Chuyáº¿n HĂ  Ná»™i â†’ ÄĂ  Náºµng khá»Ÿi hĂ nh ngĂ y mai.',
+ 'Vé đã được xác nhận',
+ 'Vé MKFEB1A535 của bạn đã được xác nhận. Chuyến Hà Nội → Đà Nẵng khởi hành ngày mai.',
  TRUE),
 
 (5, 5, 'BOOKING_CONFIRMED',
- 'VĂ© Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n',
- 'VĂ© MK693589B3 cá»§a báº¡n Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c nháº­n. Chuyáº¿n TP. HCM â†’ VÅ©ng TĂ u khá»Ÿi hĂ nh lĂºc 09:00.',
+ 'Vé đã được xác nhận',
+ 'Vé MK693589B3 của bạn đã được xác nhận. Chuyến TP. HCM → Vũng Tàu khởi hành lúc 09:00.',
  TRUE),
 
--- Nháº¯c nhá»Ÿ chuyáº¿n Ä‘i
+-- Nhắc nhở chuyến đi
 (3, 2, 'TRIP_REMINDER',
- 'Nháº¯c nhá»Ÿ: Chuyáº¿n Ä‘i cá»§a báº¡n sáº¯p khá»Ÿi hĂ nh',
- 'Chuyáº¿n TP. HCM â†’ ÄĂ  Láº¡t cá»§a báº¡n sáº½ khá»Ÿi hĂ nh trong 2 giá» ná»¯a. Vui lĂ²ng cĂ³ máº·t trÆ°á»›c 30 phĂºt.',
+ 'Nhắc nhở: Chuyến đi của bạn sắp khởi hành',
+ 'Chuyến TP. HCM → Đà Lạt của bạn sẽ khởi hành trong 2 giờ nữa. Vui lòng có mặt trước 30 phút.',
  TRUE),
 
 (4, 4, 'TRIP_REMINDER',
- 'Nháº¯c nhá»Ÿ: Chuyáº¿n Ä‘i HĂ  Ná»™i â†’ ÄĂ  Náºµng',
- 'Xe sáº½ Ä‘Ă³n báº¡n táº¡i báº¿n xe Má»¹ ÄĂ¬nh lĂºc 19:00. Vui lĂ²ng mang theo CMND/CCCD vĂ  mĂ£ vĂ©.',
+ 'Nhắc nhở: Chuyến đi Hà Nội → Đà Nẵng',
+ 'Xe sẽ đón bạn tại bến xe Mỹ Đình lúc 19:00. Vui lòng mang theo CMND/CCCD và mã vé.',
  FALSE),
 
--- Khuyáº¿n mĂ£i
+-- Khuyến mãi
 (3, NULL, 'PROMOTION',
- 'Æ¯u Ä‘Ă£i Ä‘áº·c biá»‡t cuá»‘i tuáº§n đŸ‰',
- 'Giáº£m 20% cho táº¥t cáº£ chuyáº¿n TP. HCM â†’ ÄĂ  Láº¡t vĂ o thá»© 7 vĂ  Chá»§ nháº­t. Äáº·t ngay hĂ´m nay!',
+ 'Ưu đãi đặc biệt cuối tuần 🎉',
+ 'Giảm 20% cho tất cả chuyến TP. HCM → Đà Lạt vào thứ 7 và Chủ nhật. Đặt ngay hôm nay!',
  FALSE),
 
 (4, NULL, 'PROMOTION',
- 'Flash Sale: HĂ  Ná»™i â†’ Háº¡ Long chá»‰ 99k đŸŒ',
- 'Chá»‰ cĂ²n 20 vĂ© vá»›i giĂ¡ Ä‘áº·c biá»‡t 99,000Ä‘ cho tuyáº¿n HĂ  Ná»™i - Háº¡ Long. Ăp dá»¥ng Ä‘áº¿n 23:59 hĂ´m nay.',
+ 'Flash Sale: Hà Nội → Hạ Long chỉ 99k 🔥',
+ 'Chỉ còn 20 vé với giá đặc biệt 99,000đ cho tuyến Hà Nội - Hạ Long. Áp dụng đến 23:59 hôm nay.',
  FALSE),
 
 (5, NULL, 'PROMOTION',
- 'TĂ­ch Ä‘iá»ƒm MiYuki - Nháº­n Æ°u Ä‘Ă£i ngay',
- 'Báº¡n Ä‘Ă£ tĂ­ch lÅ©y Ä‘á»§ 500 Ä‘iá»ƒm. Äá»•i ngay Ä‘á»ƒ nháº­n giáº£m giĂ¡ 50,000Ä‘ cho chuyáº¿n Ä‘i tiáº¿p theo!',
+ 'Tích điểm MiYuki - Nhận ưu đãi ngay',
+ 'Bạn đã tích lũy đủ 500 điểm. Đổi ngay để nhận giảm giá 50,000đ cho chuyến đi tiếp theo!',
  FALSE),
 
 (6, NULL, 'PROMOTION',
- 'ChĂ o má»«ng báº¡n Ä‘áº¿n vá»›i MiYuki Express! đŸŒ¸',
- 'Äáº·t chuyáº¿n Ä‘áº§u tiĂªn vĂ  nháº­n ngay mĂ£ giáº£m giĂ¡ MIYUKI10 - giáº£m 10% cho má»i tuyáº¿n Ä‘Æ°á»ng.',
+ 'Chào mừng bạn đến với MiYuki Express! 🌸',
+ 'Đặt chuyến đầu tiên và nhận ngay mã giảm giá MIYUKI10 - giảm 10% cho mọi tuyến đường.',
  FALSE),
 
--- ThĂ´ng bĂ¡o hoĂ n tiá»n
+-- Thông báo hoàn tiền
 (3, 3, 'REFUND_PROCESSED',
- 'YĂªu cáº§u hoĂ n tiá»n Ä‘Ă£ Ä‘Æ°á»£c xá»­ lĂ½',
- 'YĂªu cáº§u hoĂ n tiá»n cho vĂ© MK218A6896 Ä‘Ă£ Ä‘Æ°á»£c cháº¥p thuáº­n. 40,000Ä‘ sáº½ Ä‘Æ°á»£c hoĂ n vĂ o tĂ i khoáº£n trong 3-5 ngĂ y lĂ m viá»‡c.',
+ 'Yêu cầu hoàn tiền đã được xử lý',
+ 'Yêu cầu hoàn tiền cho vé MK218A6896 đã được chấp thuận. 40,000đ sẽ được hoàn vào tài khoản trong 3-5 ngày làm việc.',
  FALSE),
 
--- Há»‡ thá»‘ng
+-- Hệ thống
 (3, NULL, 'SYSTEM',
- 'Cáº­p nháº­t á»©ng dá»¥ng MiYuki v2.5',
- 'PhiĂªn báº£n má»›i Ä‘Ă£ cĂ³ tĂ­nh nÄƒng theo dĂµi xe thá»i gian thá»±c vĂ  Ä‘áº·t chá»— yĂªu thĂ­ch. Cáº­p nháº­t ngay!',
+ 'Cập nhật ứng dụng MiYuki v2.5',
+ 'Phiên bản mới đã có tính năng theo dõi xe thời gian thực và đặt chỗ yêu thích. Cập nhật ngay!',
  TRUE),
 
 (6, NULL, 'SYSTEM',
- 'Báº£o trĂ¬ há»‡ thá»‘ng thĂ´ng bĂ¡o',
- 'Há»‡ thá»‘ng sáº½ báº£o trĂ¬ tá»« 02:00 - 04:00 ngĂ y mai. Vui lĂ²ng hoĂ n thĂ nh Ä‘áº·t vĂ© trÆ°á»›c thá»i gian nĂ y.',
+ 'Bảo trì hệ thống thông báo',
+ 'Hệ thống sẽ bảo trì từ 02:00 - 04:00 ngày mai. Vui lòng hoàn thành đặt vé trước thời gian này.',
  TRUE);
 
 -- =================================================================
--- 4. REFUNDS (hoĂ n tiá»n)
+-- 4. REFUNDS (hoàn tiền)
 -- =================================================================
 INSERT INTO refunds
   (booking_id, payment_id, refund_amount, refund_reason, refund_status)
 VALUES
--- Booking 3 (MK218A6896 - PENDING/UNPAID) - yĂªu cáº§u há»§y
+-- Booking 3 (MK218A6896 - PENDING/UNPAID) - yêu cầu hủy
 (3, NULL, 40000.00,
- 'KhĂ¡ch hĂ ng Ä‘á»•i lá»‹ch, yĂªu cáº§u há»§y chuyáº¿n ÄĂ  Náºµng â†’ Há»™i An',
+ 'Khách hàng đổi lịch, yêu cầu hủy chuyến Đà Nẵng → Hội An',
  'COMPLETED'),
 
--- Booking 7 (MKD4CEB470 - PENDING/UNPAID) - yĂªu cáº§u há»§y má»™t pháº§n
+-- Booking 7 (MKD4CEB470 - PENDING/UNPAID) - yêu cầu hủy một phần
 (7, NULL, 185000.00,
- 'KhĂ¡ch hĂ ng khĂ´ng thá»ƒ Ä‘i do cĂ´ng viá»‡c Ä‘á»™t xuáº¥t',
+ 'Khách hàng không thể đi do công việc đột xuất',
  'PENDING'),
 
--- Booking 8 (demo) - Ä‘ang xá»­ lĂ½
+-- Booking 8 (demo) - đang xử lý
 (8, NULL, 90000.00,
- 'Xe bá»‹ há»§y chuyáº¿n do sá»± cá»‘ ká»¹ thuáº­t',
+ 'Xe bị hủy chuyến do sự cố kỹ thuật',
  'APPROVED');
 
 -- =================================================================
--- 5. 63 Tá»ˆNH THĂ€NH VIá»†T NAM - ThĂªm routes cĂ²n thiáº¿u
+-- 5. 63 TỈNH THÀNH VIỆT NAM - Thêm routes còn thiếu
 -- =================================================================
 
--- ThĂªm cĂ¡c tá»‰nh thĂ nh chÆ°a cĂ³ trong routes
+-- Thêm các tỉnh thành chưa có trong routes
 INSERT IGNORE INTO routes
   (departure_city, destination_city, distance_km, estimated_hours, base_price, status)
 VALUES
--- TP.HCM káº¿t ná»‘i cĂ¡c tá»‰nh miá»n Nam
+-- TP.HCM kết nối các tỉnh miền Nam
 ('TP. Ho Chi Minh', 'Long An',         47,  1.50,  45000,  'ACTIVE'),
 ('TP. Ho Chi Minh', 'Tien Giang',      70,  2.00,  55000,  'ACTIVE'),
 ('TP. Ho Chi Minh', 'Ben Tre',        100,  2.50,  75000,  'ACTIVE'),
@@ -795,7 +814,7 @@ VALUES
 ('TP. Ho Chi Minh', 'Tra Vinh',       160,  3.50, 100000,  'ACTIVE'),
 ('TP. Ho Chi Minh', 'Hau Giang',      240,  5.00, 145000,  'ACTIVE'),
 
--- HĂ  Ná»™i káº¿t ná»‘i miá»n Báº¯c
+-- Hà Nội kết nối miền Bắc
 ('Ha Noi', 'Bac Ninh',      30,  1.00,  40000,  'ACTIVE'),
 ('Ha Noi', 'Hung Yen',      50,  1.50,  50000,  'ACTIVE'),
 ('Ha Noi', 'Vinh Phuc',     60,  1.50,  55000,  'ACTIVE'),
@@ -818,7 +837,7 @@ VALUES
 ('Ha Noi', 'Lai Chau',     450,  9.00, 220000,  'ACTIVE'),
 ('Ha Noi', 'Dien Bien',    480, 10.00, 240000,  'ACTIVE'),
 
--- Miá»n Trung
+-- Miền Trung
 ('Da Nang', 'Quang Nam',    50,  1.50,  50000,  'ACTIVE'),
 ('Da Nang', 'Quang Ngai',  130,  2.50,  80000,  'ACTIVE'),
 ('Da Nang', 'Binh Dinh',   270,  5.00, 150000,  'ACTIVE'),
@@ -828,7 +847,7 @@ VALUES
 ('Ha Noi', 'Nghe An',      300,  6.00, 165000,  'ACTIVE'),
 ('Ha Noi', 'Ha Tinh',      350,  7.00, 185000,  'ACTIVE'),
 
--- TĂ¢y NguyĂªn
+-- Tây Nguyên
 ('TP. Ho Chi Minh', 'Dak Lak',       350,  7.00, 185000,  'ACTIVE'),
 ('TP. Ho Chi Minh', 'Dak Nong',      270,  5.50, 155000,  'ACTIVE'),
 ('TP. Ho Chi Minh', 'Gia Lai',       520, 10.00, 240000,  'ACTIVE'),
@@ -837,9 +856,9 @@ VALUES
 ('Da Nang', 'Gia Lai',               250,  5.00, 145000,  'ACTIVE');
 
 -- =================================================================
--- 6. TRIPS cho cĂ¡c tuyáº¿n má»›i (3 ngĂ y tá»›i)
+-- 6. TRIPS cho các tuyến mới (3 ngày tới)
 -- =================================================================
--- Láº¥y route_id cá»§a cĂ¡c tuyáº¿n vá»«a thĂªm vĂ  táº¡o trips
+-- Lấy route_id của các tuyến vừa thêm và tạo trips
 INSERT INTO trips (route_id, bus_id, departure_time, arrival_time, price, available_seats, status)
 SELECT r.route_id, b.bus_id,
        DATE_ADD(CURDATE(), INTERVAL 1 DAY) + INTERVAL 7 HOUR,
@@ -893,14 +912,14 @@ WHERE r.departure_city IN ('Da Nang', 'Hue')
 LIMIT 10;
 
 -- =================================================================
--- 7. SEATS cho trips má»›i
+-- 7. SEATS cho trips mới
 -- =================================================================
 CALL create_seats_for_trips();
 
 SET foreign_key_checks = 1;
 
 -- =================================================================
--- KIá»‚M TRA Káº¾T QUáº¢
+-- KIỂM TRA KẾT QUẢ
 -- =================================================================
 SELECT 'booking_details' t, COUNT(*) n FROM booking_details
 UNION ALL SELECT 'reviews',       COUNT(*) FROM reviews
@@ -912,12 +931,12 @@ UNION ALL SELECT 'seats',         COUNT(*) FROM seats;
 USE miyuki_db;
 SET NAMES utf8mb4;
 
--- Hash cá»§a máº­t kháº©u "Demo@123456"
--- Táº¥t cáº£ tĂ i khoáº£n demo dĂ¹ng cĂ¹ng máº­t kháº©u
+-- Hash của mật khẩu "Demo@123456"
+-- Tất cả tài khoản demo dùng cùng mật khẩu
 UPDATE users SET password_hash = '$2a$10$pq/WjpnSzasDOuALMX7PFuoxaG3H0trMicg9YkIVur7NY3i.Wj2nC'
-WHERE user_id IN (2, 3, 4, 5);
+WHERE user_id IN (1, 2, 3, 4, 5);
 
--- XĂ¡c nháº­n
+-- Xác nhận
 SELECT user_id, email, full_name, 
        SUBSTRING(password_hash, 1, 20) as hash_preview,
        status

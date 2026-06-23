@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class AdminController {
 
     private final UserRepository userRepository;
@@ -36,15 +35,31 @@ public class AdminController {
     private final NotificationRepository notificationRepository;
     private final RefundRepository refundRepository;
     private final TripService tripService;
+    private final com.miyuki.service.BookingService bookingService;
 
     // ==================== USERS ====================
 
     @GetMapping("/users")
     public ResponseEntity<Page<UserDTO>> getUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<User> userPage = userRepository.findAll(pageable);
+        Page<User> userPage;
+        if (search != null && !search.trim().isEmpty()) {
+            userPage = userRepository.findByFullNameContainingOrEmailContainingOrPhoneContaining(
+                search, search, search, pageable);
+        } else if (status != null && !status.isEmpty() && !"ALL".equalsIgnoreCase(status)) {
+            try {
+                User.UserStatus s = User.UserStatus.valueOf(status);
+                userPage = userRepository.findByStatus(s, pageable);
+            } catch (IllegalArgumentException e) {
+                userPage = userRepository.findAll(pageable);
+            }
+        } else {
+            userPage = userRepository.findAll(pageable);
+        }
         List<UserDTO> dtos = userPage.getContent().stream()
             .map(UserDTO::from)
             .collect(Collectors.toList());
@@ -77,8 +92,17 @@ public class AdminController {
     @GetMapping("/trips")
     public ResponseEntity<Page<Trip>> getTrips(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        if (status != null && !status.isEmpty() && !"ALL".equalsIgnoreCase(status)) {
+            try {
+                Trip.TripStatus s = Trip.TripStatus.valueOf(status);
+                return ResponseEntity.ok(tripRepository.findByStatus(s, pageable));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.ok(tripRepository.findAll(pageable));
+            }
+        }
         return ResponseEntity.ok(tripRepository.findAll(pageable));
     }
 
@@ -110,8 +134,17 @@ public class AdminController {
     @GetMapping("/bookings")
     public ResponseEntity<Page<Booking>> getBookings(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        if (status != null && !status.isEmpty() && !"ALL".equalsIgnoreCase(status)) {
+            try {
+                Booking.BookingStatus s = Booking.BookingStatus.valueOf(status);
+                return ResponseEntity.ok(bookingRepository.findByBookingStatus(s, pageable));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.ok(bookingRepository.findAll(pageable));
+            }
+        }
         return ResponseEntity.ok(bookingRepository.findAll(pageable));
     }
 
@@ -127,6 +160,26 @@ public class AdminController {
             "pendingBookings", pending,
             "confirmedBookings", confirmed
         ));
+    }
+
+    @PutMapping("/bookings/{id}/status")
+    public ResponseEntity<?> updateBookingStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        Optional<Booking> opt = bookingRepository.findById(id);
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
+        Booking booking = opt.get();
+        try {
+            Booking.BookingStatus newStatus = Booking.BookingStatus.valueOf(body.get("status"));
+            if (newStatus == Booking.BookingStatus.CANCELLED) {
+                bookingService.cancelBooking(id);
+            } else {
+                booking.setBookingStatus(newStatus);
+                booking.setUpdatedAt(java.time.LocalDateTime.now());
+                bookingRepository.save(booking);
+            }
+            return ResponseEntity.ok(bookingRepository.findById(id).orElse(booking));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid status"));
+        }
     }
 
     // ==================== BUSES ====================

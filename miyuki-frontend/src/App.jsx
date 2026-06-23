@@ -57,6 +57,12 @@ function ConditionalNavbar() {
   return <Navbar />
 }
 
+function ConditionalStarsBg() {
+  const location = useLocation()
+  if (location.pathname.startsWith('/admin')) return null
+  return <StarsBg />
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -87,7 +93,7 @@ export default function App() {
   return (
     <Router>
       <AuthProvider>
-        <StarsBg />
+        <ConditionalStarsBg />
         <ConditionalNavbar />
         <AppRoutes />
       </AuthProvider>

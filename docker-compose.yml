@@ -6,11 +6,14 @@ services:
     image: mysql:8.0
     container_name: miyuki_mysql
     restart: always
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --skip-character-set-client-handshake
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: miyuki_db
       MYSQL_USER: miyuki_user
       MYSQL_PASSWORD: 123456
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
       TZ: Asia/Ho_Chi_Minh
     ports:
       - "3306:3306"
@@ -34,7 +37,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/miyuki_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&characterEncoding=UTF-8
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/miyuki_db?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Ho_Chi_Minh
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
