@@ -147,7 +147,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div style={{ marginLeft: 240, flex: 1, minHeight: '100vh', background: 'rgba(8,15,28,0.98)' }}>
+      <div style={{ marginLeft: 240, flex: 1, minHeight: '100vh', background: 'rgba(8,15,28,0.98)', position: 'relative' }}>
         {/* Top header */}
         <header style={{
           padding: '1rem 2rem',

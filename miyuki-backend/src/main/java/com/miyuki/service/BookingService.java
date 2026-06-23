@@ -31,16 +31,16 @@ public class BookingService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
 
-        Trip trip = tripRepository.findById(tripId)
+        Trip trip = tripRepository.findByIdWithLock(tripId)
             .orElseThrow(() -> new ResourceNotFoundException("Chuyến đi không tồn tại"));
 
         if (trip.getAvailableSeats() < seatIds.size()) {
             throw new RuntimeException("Không đủ ghế trống");
         }
 
-        // Kiểm tra tất cả ghế còn trống trước khi đặt
+        // Kiểm tra tất cả ghế còn trống trước khi đặt (dùng lock để tránh race condition)
         List<Seat> seats = seatIds.stream()
-            .map(id -> seatRepository.findById(id)
+            .map(id -> seatRepository.findByIdWithLock(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ghế không tồn tại: " + id)))
             .toList();
 
@@ -98,7 +98,10 @@ public class BookingService {
         booking.setBookingStatus(Booking.BookingStatus.CANCELLED);
         booking.setCancelledAt(LocalDateTime.now());
 
-        // Trả lại ghế và cập nhật số lượng available
+        // Trả lại ghế và cập nhật số lượng available (dùng lock để tránh double-restore)
+        Trip trip = tripRepository.findByIdWithLock(booking.getTrip().getTripId())
+            .orElseThrow(() -> new ResourceNotFoundException("Chuyến đi không tồn tại"));
+
         List<Seat> bookedSeats = seatRepository.findByBooking_BookingId(bookingId);
         for (Seat seat : bookedSeats) {
             seat.setIsAvailable(true);
@@ -106,7 +109,6 @@ public class BookingService {
             seatRepository.save(seat);
         }
 
-        Trip trip = booking.getTrip();
         trip.setAvailableSeats(trip.getAvailableSeats() + bookedSeats.size());
         tripRepository.save(trip);
 

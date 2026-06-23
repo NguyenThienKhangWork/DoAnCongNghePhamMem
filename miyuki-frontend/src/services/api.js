@@ -38,13 +38,27 @@ export const userService = {
 
 export const adminService = {
   getStats: () => apiClient.get('/admin/stats'),
-  getUsers: (page = 0, size = 10) => apiClient.get(`/admin/users?page=${page}&size=${size}`),
+  getUsers: (page = 0, size = 10, search = '', status = 'ALL') => {
+    let url = `/admin/users?page=${page}&size=${size}`
+    if (search.trim()) url += `&search=${encodeURIComponent(search.trim())}`
+    if (status !== 'ALL') url += `&status=${status}`
+    return apiClient.get(url)
+  },
   updateUserStatus: (id, status) => apiClient.put(`/admin/users/${id}/status`, { status }),
-  getTrips: (page = 0, size = 10) => apiClient.get(`/admin/trips?page=${page}&size=${size}`),
+  getTrips: (page = 0, size = 10, status = 'ALL') => {
+    let url = `/admin/trips?page=${page}&size=${size}`
+    if (status !== 'ALL') url += `&status=${status}`
+    return apiClient.get(url)
+  },
   updateTripStatus: (id, status) => apiClient.put(`/admin/trips/${id}/status`, { status }),
   createTrip: (data) => apiClient.post('/admin/trips', data),
-  getBookings: (page = 0, size = 10) => apiClient.get(`/admin/bookings?page=${page}&size=${size}`),
+  getBookings: (page = 0, size = 10, status = 'ALL') => {
+    let url = `/admin/bookings?page=${page}&size=${size}`
+    if (status !== 'ALL') url += `&status=${status}`
+    return apiClient.get(url)
+  },
   getBookingStats: () => apiClient.get('/admin/bookings/stats'),
+  updateBookingStatus: (id, status) => apiClient.put(`/admin/bookings/${id}/status`, { status }),
   getRoutes: () => apiClient.get('/trips/routes'),
   getBuses: () => apiClient.get('/admin/buses'),
   getReviews: (page = 0, size = 10) => apiClient.get(`/admin/reviews?page=${page}&size=${size}`),
