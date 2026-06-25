@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AuthProvider, useAuth } from './context/AuthContext'
 import StarsBg from './components/StarsBg'
 import Navbar from './components/Navbar'
+import AIChatBox from './components/AIChatBox'
 import LandingPage from './pages/LandingPage'
 import SearchResults from './pages/SearchResults'
 import BookingPage from './pages/BookingPage'
@@ -63,6 +64,13 @@ function ConditionalStarsBg() {
   return <StarsBg />
 }
 
+// Chat box AI chỉ hiện ở trang customer, không hiện ở admin
+function ConditionalAIChatBox() {
+  const location = useLocation()
+  if (location.pathname.startsWith('/admin')) return null
+  return <AIChatBox />
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -96,6 +104,7 @@ export default function App() {
         <ConditionalStarsBg />
         <ConditionalNavbar />
         <AppRoutes />
+        <ConditionalAIChatBox />
       </AuthProvider>
     </Router>
   )

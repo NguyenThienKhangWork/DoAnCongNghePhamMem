@@ -6,12 +6,48 @@ import { CITIES, CITIES_BY_REGION } from '../data/cities'
 
 
 const POPULAR_ROUTES_STATIC = [
-  { from: 'Hà Nội', fromVal: 'Ha Noi', to: 'TP.HCM', toVal: 'TP. Ho Chi Minh', time: '32 giờ', km: '1,726 km', trips: '5 chuyến', price: '380,000đ', badge: '🔥 HOT', badgeClass: 'hot' },
-  { from: 'TP.HCM', fromVal: 'TP. Ho Chi Minh', to: 'Đà Lạt', toVal: 'Da Lat', time: '7 giờ', km: '308 km', trips: '5 chuyến', price: '165,000đ', badge: '💸 SALE', badgeClass: 'sale' },
-  { from: 'Hà Nội', fromVal: 'Ha Noi', to: 'Đà Nẵng', toVal: 'Da Nang', time: '14 giờ', km: '763 km', trips: '4 chuyến', price: '230,000đ', badge: '✨ MỚI', badgeClass: 'new' },
-  { from: 'TP.HCM', fromVal: 'TP. Ho Chi Minh', to: 'Cần Thơ', toVal: 'Can Tho', time: '3.5 giờ', km: '170 km', trips: '5 chuyến', price: '105,000đ', badge: '🔥 HOT', badgeClass: 'hot' },
-  { from: 'TP.HCM', fromVal: 'TP. Ho Chi Minh', to: 'Nha Trang', toVal: 'Nha Trang', time: '9 giờ', km: '447 km', trips: '4 chuyến', price: '230,000đ', badge: '💸 SALE', badgeClass: 'sale' },
-  { from: 'Đà Nẵng', fromVal: 'Da Nang', to: 'Hội An', toVal: 'Hoi An', time: '1 giờ', km: '30 km', trips: '3 chuyến', price: '40,000đ', badge: '✨ MỚI', badgeClass: 'new' },
+  {
+    from: 'Hà Nội', fromVal: 'Ha Noi', to: 'TP.HCM', toVal: 'TP. Ho Chi Minh',
+    time: '32 giờ', km: '1,726 km', trips: '5 chuyến', price: '380,000đ',
+    badge: '🔥 HOT', badgeClass: 'hot',
+    img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=80',
+    imgAlt: 'Hà Nội - Hồ Gươm',
+  },
+  {
+    from: 'TP.HCM', fromVal: 'TP. Ho Chi Minh', to: 'Đà Lạt', toVal: 'Da Lat',
+    time: '7 giờ', km: '308 km', trips: '5 chuyến', price: '165,000đ',
+    badge: '💸 SALE', badgeClass: 'sale',
+    img: 'https://images.unsplash.com/photo-1598935898639-81586f7d2129?w=600&q=80',
+    imgAlt: 'Đà Lạt - Thành phố ngàn hoa',
+  },
+  {
+    from: 'Hà Nội', fromVal: 'Ha Noi', to: 'Đà Nẵng', toVal: 'Da Nang',
+    time: '14 giờ', km: '763 km', trips: '4 chuyến', price: '230,000đ',
+    badge: '✨ MỚI', badgeClass: 'new',
+    img: 'https://images.unsplash.com/photo-1570366583862-f91883984fde?w=600&q=80',
+    imgAlt: 'Đà Nẵng - Cầu Rồng',
+  },
+  {
+    from: 'TP.HCM', fromVal: 'TP. Ho Chi Minh', to: 'Cần Thơ', toVal: 'Can Tho',
+    time: '3.5 giờ', km: '170 km', trips: '5 chuyến', price: '105,000đ',
+    badge: '🔥 HOT', badgeClass: 'hot',
+    img: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80',
+    imgAlt: 'Cần Thơ - Chợ nổi Cái Răng',
+  },
+  {
+    from: 'TP.HCM', fromVal: 'TP. Ho Chi Minh', to: 'Nha Trang', toVal: 'Nha Trang',
+    time: '9 giờ', km: '447 km', trips: '4 chuyến', price: '230,000đ',
+    badge: '💸 SALE', badgeClass: 'sale',
+    img: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600&q=80',
+    imgAlt: 'Nha Trang - Biển xanh',
+  },
+  {
+    from: 'Đà Nẵng', fromVal: 'Da Nang', to: 'Hội An', toVal: 'Hoi An',
+    time: '1 giờ', km: '30 km', trips: '3 chuyến', price: '40,000đ',
+    badge: '✨ MỚI', badgeClass: 'new',
+    img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=80',
+    imgAlt: 'Hội An - Phố cổ đèn lồng',
+  },
 ]
 
 export default function LandingPage() {
@@ -166,7 +202,7 @@ export default function LandingPage() {
           </div>
           <a href="/search" onClick={e => { e.preventDefault(); navigate('/search') }} style={{ color: 'var(--sakura)', fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem', opacity: 0.8 }}>Xem tất cả →</a>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1.2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1.4rem' }}>
           {POPULAR_ROUTES_STATIC.map((r, i) => (
             <RouteCard key={i} route={r} onClick={() => navigate(`/search?departure=${encodeURIComponent(r.fromVal)}&destination=${encodeURIComponent(r.toVal)}&date=${new Date().toISOString().split('T')[0]}`)} />
           ))}
@@ -267,36 +303,186 @@ function Field({ label, children }) {
 function RouteCard({ route, onClick }) {
   const [hovered, setHovered] = useState(false)
   const [clicked, setClicked] = useState(false)
+  const [imgLoaded, setImgLoaded] = useState(false)
+
   const badgeStyle = {
-    hot: { background: 'rgba(255,107,157,0.2)', color: 'var(--sakura)', border: '1px solid rgba(255,107,157,0.4)' },
-    sale: { background: 'rgba(255,215,0,0.15)', color: 'var(--star)', border: '1px solid rgba(255,215,0,0.3)' },
-    new: { background: 'rgba(123,47,190,0.2)', color: 'var(--violet-light)', border: '1px solid rgba(192,132,252,0.4)' },
+    hot:  { background: 'rgba(255,107,157,0.85)', color: '#fff', border: 'none' },
+    sale: { background: 'rgba(255,190,0,0.9)',    color: '#1a1a00', border: 'none' },
+    new:  { background: 'rgba(123,47,190,0.85)',  color: '#fff', border: 'none' },
   }[route.badgeClass]
 
   return (
-    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ background: 'var(--card-bg)', border: `1px solid ${hovered ? 'var(--sakura)' : 'var(--card-border)'}`, borderRadius: 20, padding: '1.5rem', cursor: 'pointer', transition: 'transform 0.25s, box-shadow 0.25s', transform: hovered ? 'translateY(-6px)' : 'none', boxShadow: hovered ? '0 16px 40px rgba(255,107,157,0.2)' : 'none', position: 'relative', overflow: 'hidden' }}>
-      <span style={{ position: 'absolute', top: '1rem', right: '1rem', fontSize: '0.7rem', fontWeight: 800, padding: '0.2rem 0.7rem', borderRadius: 50, letterSpacing: '0.3px', ...badgeStyle }}>{route.badge}</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem' }}>
-        <span style={{ fontSize: '1.15rem', fontWeight: 900 }}>{route.from}</span>
-        <span style={{ color: 'var(--sakura)', fontSize: '1.1rem' }}>→</span>
-        <span style={{ fontSize: '1.15rem', fontWeight: 900 }}>{route.to}</span>
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => { setClicked(true); setTimeout(() => { setClicked(false); onClick() }, 500) }}
+      style={{
+        borderRadius: 20,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        position: 'relative',
+        height: 240,
+        border: `1.5px solid ${hovered ? 'rgba(255,107,157,0.7)' : 'rgba(255,107,157,0.25)'}`,
+        boxShadow: hovered
+          ? '0 20px 48px rgba(255,107,157,0.28), 0 4px 12px rgba(0,0,0,0.4)'
+          : '0 4px 16px rgba(0,0,0,0.3)',
+        transform: hovered ? 'translateY(-8px) scale(1.01)' : 'translateY(0) scale(1)',
+        transition: 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s, border-color 0.3s',
+        background: '#0D1B2A',
+      }}
+    >
+      {/* ── Ảnh nền ── */}
+      <img
+        src={route.img}
+        alt={route.imgAlt}
+        onLoad={() => setImgLoaded(true)}
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover',
+          opacity: imgLoaded ? (hovered ? 0.55 : 0.45) : 0,
+          transition: 'opacity 0.5s ease',
+          filter: 'saturate(1.15)',
+        }}
+      />
+
+      {/* Skeleton khi ảnh chưa load */}
+      {!imgLoaded && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, #1A1A3E 0%, #2D1B69 50%, #1A1A3E 100%)',
+          backgroundSize: '200% 200%',
+          animation: 'shimmer 1.5s ease infinite',
+        }} />
+      )}
+
+      {/* Overlay gradient */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: hovered
+          ? 'linear-gradient(180deg, rgba(13,27,42,0.25) 0%, rgba(13,27,42,0.88) 55%, rgba(13,27,42,0.98) 100%)'
+          : 'linear-gradient(180deg, rgba(13,27,42,0.3) 0%, rgba(13,27,42,0.82) 50%, rgba(13,27,42,0.98) 100%)',
+        transition: 'background 0.3s',
+      }} />
+
+      {/* ── Badge góc trên phải ── */}
+      <span style={{
+        position: 'absolute', top: '0.75rem', right: '0.75rem',
+        fontSize: '0.68rem', fontWeight: 800,
+        padding: '0.22rem 0.65rem', borderRadius: 50,
+        letterSpacing: '0.3px',
+        backdropFilter: 'blur(6px)',
+        ...badgeStyle,
+      }}>
+        {route.badge}
+      </span>
+
+      {/* ── Tên tuyến góc trên trái ── */}
+      <div style={{
+        position: 'absolute', top: '0.9rem', left: '1rem',
+        display: 'flex', alignItems: 'center', gap: '0.4rem',
+      }}>
+        <span style={{
+          fontSize: '0.72rem', fontWeight: 700,
+          color: 'rgba(255,255,255,0.75)',
+          background: 'rgba(13,27,42,0.6)',
+          backdropFilter: 'blur(6px)',
+          padding: '0.18rem 0.55rem',
+          borderRadius: 50,
+          border: '1px solid rgba(255,255,255,0.12)',
+        }}>
+          {route.imgAlt}
+        </span>
       </div>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-        {[`⏱ ${route.time}`, `📏 ${route.km}`, `🚌 ${route.trips}`].map(m => (
-          <span key={m} style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{m}</span>
-        ))}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '0.8rem' }}>
-        <div>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>Từ</span>
-          <span style={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(90deg,#FF6B9D,#C084FC)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{route.price}</span>
+
+      {/* ── Nội dung phía dưới ── */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        padding: '1rem 1.1rem 1rem',
+      }}>
+        {/* Route name */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.5rem',
+          marginBottom: '0.55rem',
+        }}>
+          <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+            {route.from}
+          </span>
+          <span style={{
+            color: '#FF6B9D', fontSize: '1rem',
+            filter: 'drop-shadow(0 0 4px rgba(255,107,157,0.6))',
+          }}>→</span>
+          <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+            {route.to}
+          </span>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); setClicked(true); setTimeout(() => { setClicked(false); onClick() }, 600) }}
-          style={{ background: 'rgba(255,107,157,0.12)', border: '1px solid rgba(255,107,157,0.35)', color: 'var(--sakura)', padding: '0.35rem 1rem', borderRadius: 50, fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'Nunito,sans-serif', transition: 'background 0.2s' }}>
-          {clicked ? '✅ Đã chọn!' : 'Đặt vé'}
-        </button>
+
+        {/* Meta info */}
+        <div style={{
+          display: 'flex', gap: '0.8rem', marginBottom: '0.75rem', flexWrap: 'wrap',
+        }}>
+          {[`⏱ ${route.time}`, `📏 ${route.km}`, `🚌 ${route.trips}`].map(m => (
+            <span key={m} style={{
+              fontSize: '0.76rem', color: 'rgba(255,255,255,0.7)',
+              background: 'rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(4px)',
+              padding: '0.15rem 0.55rem',
+              borderRadius: 50,
+            }}>
+              {m}
+            </span>
+          ))}
+        </div>
+
+        {/* Price + CTA */}
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          paddingTop: '0.65rem',
+        }}>
+          <div>
+            <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.55)', display: 'block', fontWeight: 600 }}>Từ</span>
+            <span style={{
+              fontSize: '1.2rem', fontWeight: 900,
+              background: 'linear-gradient(90deg, #FF6B9D, #C084FC)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 8px rgba(255,107,157,0.4))',
+            }}>
+              {route.price}
+            </span>
+          </div>
+          <button
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: clicked
+                ? 'linear-gradient(135deg, #4ade80, #22c55e)'
+                : 'linear-gradient(135deg, #FF6B9D, #7B2FBE)',
+              border: 'none',
+              color: 'white',
+              padding: '0.45rem 1.2rem',
+              borderRadius: 50,
+              fontSize: '0.82rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              fontFamily: 'Nunito, sans-serif',
+              boxShadow: '0 2px 12px rgba(255,107,157,0.4)',
+              transition: 'background 0.3s, transform 0.2s',
+              transform: hovered ? 'scale(1.05)' : 'scale(1)',
+            }}
+          >
+            {clicked ? '✅ Đã chọn!' : '🎫 Đặt vé'}
+          </button>
+        </div>
       </div>
+
+      {/* Shimmer animation */}
+      <style>{`
+        @keyframes shimmer {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
     </div>
   )
 }
