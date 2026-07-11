@@ -20,6 +20,9 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [sortBy, setSortBy] = useState('price')
+  const [filterBusType, setFilterBusType] = useState(searchParams.get('busType')  || 'ALL')
+  const [filterTimeSlot, setFilterTimeSlot] = useState(searchParams.get('timeSlot') || 'ALL')
+  const [filterMaxPrice, setFilterMaxPrice] = useState(searchParams.get('maxPrice') || 'ALL')
   const [form, setForm] = useState({
     departure:   searchParams.get('departure')   || '',
     destination: searchParams.get('destination') || '',
@@ -54,7 +57,20 @@ export default function SearchResults() {
   const swapCities = () =>
     setForm(f => ({ ...f, departure: f.destination, destination: f.departure }))
 
-  const sorted = [...trips].sort((a, b) => {
+  const getTimeSlot = (departureTime) => {
+    const hour = new Date(departureTime).getHours()
+    if (hour >= 0  && hour < 6)  return 'dawn'    // 0–6h
+    if (hour >= 6  && hour < 12) return 'morning'  // 6–12h
+    if (hour >= 12 && hour < 18) return 'afternoon' // 12–18h
+    return 'night'                                  // 18–24h
+  }
+
+  const filtered = trips
+    .filter(t => filterBusType === 'ALL' || t.bus?.busType === filterBusType)
+    .filter(t => filterTimeSlot === 'ALL' || getTimeSlot(t.departureTime) === filterTimeSlot)
+    .filter(t => filterMaxPrice === 'ALL' || Number(t.price) <= Number(filterMaxPrice))
+
+  const sorted = [...filtered].sort((a, b) => {
     if (sortBy === 'price') return a.price - b.price
     if (sortBy === 'time')  return new Date(a.departureTime) - new Date(b.departureTime)
     return b.availableSeats - a.availableSeats
@@ -138,24 +154,60 @@ export default function SearchResults() {
 
       {/* ── Results ── */}
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '1.5rem 1.5rem 3rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <h1 style={{ fontSize: '1.3rem', fontWeight: 900 }}>
             {form.departure && form.destination
               ? `${getCityLabel(form.departure)} → ${getCityLabel(form.destination)}`
               : 'Kết Quả Tìm Kiếm'}
             {trips.length > 0 && (
               <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.9rem', marginLeft: 8 }}>
-                ({trips.length} chuyến)
+                ({sorted.length}/{trips.length} chuyến)
               </span>
             )}
           </h1>
-          {trips.length > 1 && (
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-              style={{ ...selectStyle, width: 'auto', padding: '0.4rem 0.8rem' }}>
-              <option value="price">Giá thấp nhất</option>
-              <option value="time">Giờ sớm nhất</option>
-              <option value="seats">Còn nhiều ghế</option>
-            </select>
+          {trips.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* Lọc loại xe */}
+              <select value={filterBusType} onChange={e => setFilterBusType(e.target.value)}
+                style={{ ...selectStyle, width: 'auto', padding: '0.4rem 0.7rem', fontSize: '0.82rem' }}>
+                <option value="ALL">🚌 Tất cả loại xe</option>
+                <option value="SEAT">🚌 Ghế ngồi</option>
+                <option value="SLEEPER">🛏 Giường nằm</option>
+                <option value="LIMOUSINE">💺 Limousine</option>
+              </select>
+              {/* Lọc giờ khởi hành */}
+              <select value={filterTimeSlot} onChange={e => setFilterTimeSlot(e.target.value)}
+                style={{ ...selectStyle, width: 'auto', padding: '0.4rem 0.7rem', fontSize: '0.82rem' }}>
+                <option value="ALL">⏰ Tất cả giờ</option>
+                <option value="dawn">🌙 Đêm (0–6h)</option>
+                <option value="morning">🌅 Sáng (6–12h)</option>
+                <option value="afternoon">☀️ Chiều (12–18h)</option>
+                <option value="night">🌆 Tối (18–24h)</option>
+              </select>
+              {/* Lọc khoảng giá */}
+              <select value={filterMaxPrice} onChange={e => setFilterMaxPrice(e.target.value)}
+                style={{ ...selectStyle, width: 'auto', padding: '0.4rem 0.7rem', fontSize: '0.82rem' }}>
+                <option value="ALL">💰 Tất cả mức giá</option>
+                <option value="100000">Dưới 100,000đ</option>
+                <option value="200000">Dưới 200,000đ</option>
+                <option value="300000">Dưới 300,000đ</option>
+                <option value="500000">Dưới 500,000đ</option>
+              </select>
+              {/* Sắp xếp */}
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)}
+                style={{ ...selectStyle, width: 'auto', padding: '0.4rem 0.7rem', fontSize: '0.82rem' }}>
+                <option value="price">⬆️ Giá thấp nhất</option>
+                <option value="time">⏱ Giờ sớm nhất</option>
+                <option value="seats">💺 Còn nhiều ghế</option>
+              </select>
+              {/* Reset filter */}
+              {(filterBusType !== 'ALL' || filterTimeSlot !== 'ALL' || filterMaxPrice !== 'ALL') && (
+                <button onClick={() => { setFilterBusType('ALL'); setFilterTimeSlot('ALL'); setFilterMaxPrice('ALL') }}
+                  style={{ background: 'rgba(255,107,157,0.15)', border: '1px solid rgba(255,107,157,0.4)', color: 'var(--sakura)', padding: '0.4rem 0.8rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700, fontFamily: 'Nunito,sans-serif' }}>
+                  ✕ Bỏ lọc
+                </button>
+              )}
+            </div>
           )}
         </div>
 
@@ -172,10 +224,22 @@ export default function SearchResults() {
         ) : sorted.length === 0 && (form.departure || form.destination) ? (
           <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚌</div>
-            <p>Không có chuyến xe nào cho lộ trình này</p>
-            <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-              Thử chọn ngày khác hoặc tuyến đường khác
-            </p>
+            {trips.length > 0 && sorted.length === 0 ? (
+              <>
+                <p>Không có chuyến nào khớp với bộ lọc</p>
+                <button onClick={() => { setFilterBusType('ALL'); setFilterTimeSlot('ALL') }}
+                  style={{ marginTop: '1rem', background: 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontFamily: 'Nunito,sans-serif' }}>
+                  Xóa bộ lọc
+                </button>
+              </>
+            ) : (
+              <>
+                <p>Không có chuyến xe nào cho lộ trình này</p>
+                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                  Thử chọn ngày khác hoặc tuyến đường khác
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

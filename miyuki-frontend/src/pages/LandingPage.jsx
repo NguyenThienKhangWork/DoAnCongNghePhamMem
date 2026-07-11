@@ -54,7 +54,10 @@ export default function LandingPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
     departure: '', destination: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    busType: 'ALL',
+    timeSlot: 'ALL',
+    maxPrice: 'ALL',
   })
   const [activeTab, setActiveTab] = useState(0)
   const [popularTrips, setPopularTrips] = useState([])
@@ -66,7 +69,16 @@ export default function LandingPage() {
   const handleSearch = (e) => {
     e.preventDefault()
     if (!form.departure || !form.destination) return
-    navigate(`/search?departure=${encodeURIComponent(form.departure)}&destination=${encodeURIComponent(form.destination)}&date=${form.date}`)  }
+    const params = new URLSearchParams({
+      departure: form.departure,
+      destination: form.destination,
+      date: form.date,
+    })
+    if (form.busType  !== 'ALL') params.set('busType',  form.busType)
+    if (form.timeSlot !== 'ALL') params.set('timeSlot', form.timeSlot)
+    if (form.maxPrice !== 'ALL') params.set('maxPrice', form.maxPrice)
+    navigate(`/search?${params.toString()}`)
+  }
 
   const swapCities = () => setForm(f => ({ ...f, departure: f.destination, destination: f.departure }))
 
@@ -89,7 +101,7 @@ export default function LandingPage() {
             Đặt vé xe khách toàn quốc dễ dàng — từ Hà Nội đến Sài Gòn, từ Đà Lạt đến Hội An. An toàn, tiện lợi, giá rẻ nhất thị trường! 🚌
           </p>
           <div style={{ display: 'flex', gap: '0.7rem', flexWrap: 'wrap', marginBottom: '1.8rem' }}>
-            {[['🛡️ Hoàn tiền 100%', 'pink'], ['✅ 2,000+ chuyến/ngày', 'violet'], ['⭐ 4.9/5 đánh giá', 'star']].map(([label, type]) => (
+            {[['🛡️ Hoàn tiền 100%', 'pink'], ['✅ 100+ chuyến sắp tới', 'violet'], ['⭐ 4.9/5 đánh giá', 'star']].map(([label, type]) => (
               <span key={label} style={{
                 background: type === 'pink' ? 'rgba(255,107,157,0.15)' : type === 'violet' ? 'rgba(123,47,190,0.18)' : 'rgba(255,215,0,0.12)',
                 border: `1px solid ${type === 'pink' ? 'rgba(255,107,157,0.4)' : type === 'violet' ? 'rgba(192,132,252,0.4)' : 'rgba(255,215,0,0.35)'}`,
@@ -159,23 +171,42 @@ export default function LandingPage() {
               <input type="date" value={form.date} min={new Date().toISOString().split('T')[0]} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required />
             </Field>
           </div>
-          {/* Row 2 — disabled, sắp ra mắt */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem', marginTop: '1rem', opacity: 0.5 }}>
+          {/* Row 2 — Bộ lọc nâng cao */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
             <Field label="👥 Số hành khách">
-              <select disabled title="Sắp ra mắt"><option>1 hành khách</option></select>
+              <select value="1" onChange={() => {}}>
+                <option value="1">1 hành khách</option>
+                <option value="2">2 hành khách</option>
+                <option value="3">3 hành khách</option>
+                <option value="4">4 hành khách</option>
+              </select>
             </Field>
-            <Field label="🪑 Loại ghế">
-              <select disabled title="Sắp ra mắt"><option>Tất cả loại xe</option></select>
+            <Field label="🪑 Loại xe">
+              <select value={form.busType} onChange={e => setForm(f => ({ ...f, busType: e.target.value }))}>
+                <option value="ALL">Tất cả loại xe</option>
+                <option value="SEAT">🚌 Ghế ngồi</option>
+                <option value="SLEEPER">🛏 Giường nằm</option>
+                <option value="LIMOUSINE">💺 Limousine</option>
+              </select>
             </Field>
             <Field label="⏰ Giờ khởi hành">
-              <select disabled title="Sắp ra mắt"><option>Tất cả giờ</option></select>
+              <select value={form.timeSlot} onChange={e => setForm(f => ({ ...f, timeSlot: e.target.value }))}>
+                <option value="ALL">Tất cả giờ</option>
+                <option value="dawn">🌙 Đêm (0–6h)</option>
+                <option value="morning">🌅 Sáng (6–12h)</option>
+                <option value="afternoon">☀️ Chiều (12–18h)</option>
+                <option value="night">🌆 Tối (18–24h)</option>
+              </select>
             </Field>
             <Field label="💰 Khoảng giá">
-              <select disabled title="Sắp ra mắt"><option>Tất cả mức giá</option></select>
+              <select value={form.maxPrice} onChange={e => setForm(f => ({ ...f, maxPrice: e.target.value }))}>
+                <option value="ALL">Tất cả mức giá</option>
+                <option value="100000">Dưới 100,000đ</option>
+                <option value="200000">Dưới 200,000đ</option>
+                <option value="300000">Dưới 300,000đ</option>
+                <option value="500000">Dưới 500,000đ</option>
+              </select>
             </Field>
-          </div>
-          <div style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            ⏳ Các bộ lọc nâng cao sẽ sớm ra mắt
           </div>
           <button type="submit" style={{ background: 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', padding: '0.75rem 2rem', borderRadius: 12, fontWeight: 800, fontSize: '1rem', cursor: 'pointer', fontFamily: 'Nunito,sans-serif', width: '100%', marginTop: '1.5rem', letterSpacing: '0.3px' }}>
             🔍 Tìm kiếm chuyến đi ngay
@@ -185,7 +216,7 @@ export default function LandingPage() {
 
       {/* STATS */}
       <div style={{ ...s.section, padding: '3.5rem 2rem', maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem', textAlign: 'center' }}>
-        {[['2,500+','🚌 Chuyến xe mỗi ngày'],['63','📍 Tỉnh thành phủ sóng'],['850+','🏢 Nhà xe đối tác'],['5M+','😊 Khách hàng hài lòng']].map(([num, label]) => (
+        {[['100+','🚌 Chuyến xe sắp tới'],['11','📍 Tỉnh thành phủ sóng'],['8','🏢 Nhà xe đối tác'],['82+','🗺️ Tuyến đường']].map(([num, label]) => (
           <div key={label} style={{ padding: '1.5rem' }}>
             <div style={{ fontSize: '2.5rem', fontWeight: 900, background: 'linear-gradient(135deg,#FF6B9D,#FFD700)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', lineHeight: 1, marginBottom: '0.4rem' }}>{num}</div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{label}</div>
