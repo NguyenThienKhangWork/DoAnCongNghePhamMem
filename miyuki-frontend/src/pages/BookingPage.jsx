@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { tripService, bookingService, paymentService } from '../services/api'
 
 export default function BookingPage() {
   const { tripId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const method = location.state?.method || 'VIETQR'
   const [trip, setTrip] = useState(null)
   const [seats, setSeats] = useState([])
   const [selected, setSelected] = useState([])
@@ -38,9 +40,8 @@ export default function BookingPage() {
     setSubmitting(true); setError('')
     try {
       const { data: booking } = await bookingService.createBooking({ tripId: Number(tripId), seatIds: selected.map(s => s.seatId) })
-      await paymentService.createPayment({ bookingId: booking.bookingId, paymentMethod: 'CASH' })
-      setDone(true)
-      setTimeout(() => navigate('/my-bookings'), 3000)
+      const { data } = await paymentService.generateVietQR(booking.bookingId)
+      navigate(`/payment/${data.transactionId}`, { state: { qrData: data } })
     } catch (err) { setError(err.response?.data?.message || 'Đặt vé thất bại, vui lòng thử lại') }
     finally { setSubmitting(false) }
   }

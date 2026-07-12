@@ -61,3 +61,8 @@ springdoc:
     tags-sorter: alpha
   api-docs:
     path: /v3/api-docs
+
+bank:
+  bin:  970436 #Mã BIN ngân hàng BIDV(tùy mã BIN của mỗi BANK khác nhau)
+  account-number: 7621982567 #Số tài khoản nhận
+  account-name: "MIYUKI EXPRESS" #Tên chủ tài khoản nhận

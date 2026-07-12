@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/trips/**", "/seats/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/payments/vietqr/image/**").permitAll()
                 // Admin endpoints - chỉ ADMIN role mới được vào
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // All other requests require authentication
