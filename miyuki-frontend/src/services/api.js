@@ -25,6 +25,7 @@ export const bookingService = {
 
 export const paymentService = {
   createPayment: (data) => apiClient.post('/payments', data),
+  createVNPayPayment: (bookingId) => apiClient.post('/payments/vnpay/create', { bookingId }),
   getPayment: (id) => apiClient.get(`/payments/${id}`),
   completePayment: (id) => apiClient.put(`/payments/${id}/complete`),
   refundPayment: (id, data) => apiClient.put(`/payments/${id}/refund`, data),

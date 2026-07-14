@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 
 // ──────────────────────────────────────────────
-// Gemini API key — đọc từ biến môi trường Vite
+// OpenRouter API key — đọc từ biến môi trường Vite
 // Tạo file .env tại miyuki-frontend/ với nội dung:
-//   VITE_GEMINI_API_KEY=your_api_key_here
+//   VITE_OPENROUTER_API_KEY=your_api_key_here
 // ──────────────────────────────────────────────
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || ''
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const OPENROUTER_MODEL = 'openai/gpt-4o-mini'
 
 // System prompt — làm cho AI chỉ trả lời về MiYuki Express
 const SYSTEM_PROMPT = `Bạn là Miyuki-chan 🌸, trợ lý AI chăm sóc khách hàng thân thiện của **MiYuki Express** — hệ thống đặt vé xe khách trực tuyến tại Việt Nam.
@@ -30,39 +31,36 @@ Thông tin nền:
 - Liên hệ hỗ trợ: support@miyuki.vn`
 
 // ──────────────────────────────────────────────
-// Gọi Gemini API
+// Gọi OpenRouter API (OpenAI-compatible)
 // ──────────────────────────────────────────────
-async function callGemini(history, userMessage) {
-  const contents = []
+async function callOpenRouter(history, userMessage) {
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+  ]
 
-  // Đưa lịch sử vào (bỏ system prompt khỏi history, chỉ user/model)
+  // Đưa lịch sử vào
   for (const msg of history) {
-    contents.push({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }]
-    })
+    messages.push({ role: msg.role, content: msg.content })
   }
 
   // Thêm tin nhắn mới nhất
-  contents.push({
-    role: 'user',
-    parts: [{ text: userMessage }]
-  })
+  messages.push({ role: 'user', content: userMessage })
 
   const body = {
-    system_instruction: {
-      parts: [{ text: SYSTEM_PROMPT }]
-    },
-    contents,
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 512
-    }
+    model: OPENROUTER_MODEL,
+    messages,
+    temperature: 0.7,
+    max_tokens: 512,
   }
 
-  const res = await fetch(GEMINI_URL, {
+  const res = await fetch(OPENROUTER_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': window.location.origin,
+      'X-Title': 'MiYuki Express',
+    },
     body: JSON.stringify(body)
   })
 
@@ -72,7 +70,7 @@ async function callGemini(history, userMessage) {
   }
 
   const data = await res.json()
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Xin lỗi, tôi không hiểu câu hỏi này. Bạn có thể hỏi lại không? 🌸'
+  return data?.choices?.[0]?.message?.content || 'Xin lỗi, tôi không hiểu câu hỏi này. Bạn có thể hỏi lại không? 🌸'
 }
 
 // ──────────────────────────────────────────────
@@ -132,7 +130,7 @@ export default function AIChatBox() {
     try {
       // Chỉ truyền history (không kể tin chào đầu)
       const history = newMessages.slice(1, -1) // bỏ tin chào và tin vừa gửi
-      const reply = await callGemini(history, userText)
+      const reply = await callOpenRouter(history, userText)
       setMessages(prev => [...prev, { role: 'assistant', content: reply }])
     } catch (err) {
       const errMsg = err?.message || String(err)
@@ -277,7 +275,7 @@ export default function AIChatBox() {
                 display: 'inline-block',
                 boxShadow: '0 0 6px #4ade80',
               }} />
-              AI Chăm sóc khách hàng · Gemini
+              AI Chăm sóc khách hàng · OpenAI
             </div>
           </div>
 
@@ -510,7 +508,7 @@ export default function AIChatBox() {
           color: 'rgba(176,160,204,0.5)',
           flexShrink: 0,
         }}>
-          ✨ Powered by Google Gemini
+          ✨ Powered by OpenRouter · GPT-4o mini
         </div>
       </div>
 

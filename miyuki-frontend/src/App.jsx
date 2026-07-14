@@ -19,6 +19,7 @@ import AdminReviews from './pages/admin/AdminReviews'
 import AdminNotifications from './pages/admin/AdminNotifications'
 import AdminRefunds from './pages/admin/AdminRefunds'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
+import PaymentResult from './pages/PaymentResult'
 
 function ProtectedRoute({ children }) {
   const { token, loading } = useAuth()
@@ -80,6 +81,7 @@ function AppRoutes() {
       <Route path="/booking/:tripId" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
       <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/payment-result" element={<PaymentResult />} />
       {/* Trang đăng nhập riêng cho admin */}
       <Route path="/admin/login" element={<AdminLoginPage />} />
       {/* Các trang admin - chỉ ADMIN role mới vào được */}
