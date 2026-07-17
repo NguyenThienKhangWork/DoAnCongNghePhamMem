@@ -50,9 +50,10 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login", "/auth/validate-token").permitAll()
                 .requestMatchers(HttpMethod.GET, "/trips/**", "/seats/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/payments/vnpay/return", "/payments/vnpay/ipn").permitAll()
+                .requestMatchers(HttpMethod.POST, "/payments/vnpay/create").authenticated()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/payments/vietqr/image/**").permitAll()
                 // Admin endpoints - chỉ ADMIN role mới được vào
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // All other requests require authentication

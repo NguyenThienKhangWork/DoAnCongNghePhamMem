@@ -6,7 +6,6 @@ import AIChatBox from './components/AIChatBox'
 import LandingPage from './pages/LandingPage'
 import SearchResults from './pages/SearchResults'
 import BookingPage from './pages/BookingPage'
-import PaymentPage from './pages/PaymentPage'
 import MyBookings from './pages/MyBookings'
 import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
@@ -20,6 +19,7 @@ import AdminReviews from './pages/admin/AdminReviews'
 import AdminNotifications from './pages/admin/AdminNotifications'
 import AdminRefunds from './pages/admin/AdminRefunds'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
+import PaymentResult from './pages/PaymentResult'
 
 function ProtectedRoute({ children }) {
   const { token, loading } = useAuth()
@@ -79,9 +79,9 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/search" element={<SearchResults />} />
       <Route path="/booking/:tripId" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
-      <Route path="/payment/:transactionId" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
       <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/payment-result" element={<PaymentResult />} />
       {/* Trang đăng nhập riêng cho admin */}
       <Route path="/admin/login" element={<AdminLoginPage />} />
       {/* Các trang admin - chỉ ADMIN role mới vào được */}

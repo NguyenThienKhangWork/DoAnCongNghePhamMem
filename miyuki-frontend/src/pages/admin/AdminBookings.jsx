@@ -71,7 +71,6 @@ function BookingDetailModal({ booking, onClose, onAction, updating }) {
         {row('Ngày đi', fmtDate(booking.departureDate))}
         {row('Tổng tiền', fmtVND(booking.totalPrice))}
         {row('Trạng thái', <BookingBadge status={booking.bookingStatus} />)}
-        {row('Phương thức', booking.paymentMethod || 'CASH')}
         {row('Thanh toán', <PaymentBadge status={booking.paymentStatus} />)}
         {row('Ngày tạo', fmtDT(booking.createdAt))}
         {booking.cancelledAt && row('Ngày huỷ', fmtDT(booking.cancelledAt))}

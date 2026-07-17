@@ -25,22 +25,16 @@ export const bookingService = {
 
 export const paymentService = {
   createPayment: (data) => apiClient.post('/payments', data),
+  createVNPayPayment: (bookingId) => apiClient.post('/payments/vnpay/create', { bookingId }),
   getPayment: (id) => apiClient.get(`/payments/${id}`),
   completePayment: (id) => apiClient.put(`/payments/${id}/complete`),
   refundPayment: (id, data) => apiClient.put(`/payments/${id}/refund`, data),
-  generateVietQR: (bookingId) => apiClient.post(`/payments/vietqr/generate?bookingId=${bookingId}`),
-  markVietQRPaid: (transactionId) => apiClient.put(`/payments/vietqr/mark-paid/${transactionId}`),
 }
 
 export const userService = {
   getProfile: () => apiClient.get('/users/profile'),
   updateProfile: (data) => apiClient.put('/users/profile', data),
   changePassword: (data) => apiClient.post('/users/change-password', data),
-}
-
-export const refundService = {
-  requestRefund: (data) => apiClient.post('/refunds', data),
-  getMyRefunds: (userId) => apiClient.get(`/refunds/my?userId=${userId}`),
 }
 
 export const adminService = {

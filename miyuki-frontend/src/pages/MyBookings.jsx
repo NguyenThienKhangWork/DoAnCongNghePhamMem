@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { bookingService, refundService } from '../services/api'
-import { useAuth } from '../context/AuthContext'
+import { bookingService } from '../services/api'
 
 const STATUS = {
   PENDING:   { label: 'Chờ xác nhận', color: '#FFD700', bg: 'rgba(255,215,0,0.12)' },
@@ -9,13 +8,6 @@ const STATUS = {
   CANCELLED: { label: 'Đã hủy',        color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
   COMPLETED: { label: 'Hoàn thành',   color: '#60a5fa', bg: 'rgba(96,165,250,0.12)' },
 }
-const REFUND_STATUS = {
-  PENDING:   { label: 'Chờ duyệt',  color: '#FFD700', bg: 'rgba(255,215,0,0.12)' },
-  APPROVED:  { label: 'Đã duyệt',   color: '#2196F3', bg: 'rgba(33,150,243,0.12)' },
-  COMPLETED: { label: 'Hoàn thành', color: '#4CAF50', bg: 'rgba(76,175,80,0.12)' },
-  REJECTED:  { label: 'Từ chối',    color: '#F44336', bg: 'rgba(244,67,54,0.12)' },
-}
-
 const PAYMENT = {
   UNPAID:   { label: 'Chưa thanh toán', color: '#fb923c' },
   PAID:     { label: 'Đã thanh toán',   color: '#4ade80' },
@@ -42,17 +34,11 @@ function safeDateShort(dt) {
 
 export default function MyBookings() {
   const navigate = useNavigate()
-  const { user } = useAuth()
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [cancelling, setCancelling] = useState(null)
   const [filter, setFilter] = useState('ALL')
   const [error, setError] = useState('')
-  const [refunding, setRefunding] = useState(null)
-  const [showRefundModal, setShowRefundModal] = useState(null)
-  const [refundReason, setRefundReason] = useState('')
-  const [submittingRefund, setSubmittingRefund] = useState(false)
-  const [refunds, setRefunds] = useState([])
 
   useEffect(() => { fetchBookings() }, [])
 
@@ -83,26 +69,6 @@ export default function MyBookings() {
     }
   }
 
-  const handleRequestRefund = async () => {
-    if (!showRefundModal) return
-    setSubmittingRefund(true)
-    try {
-      await refundService.requestRefund({
-        userId: user.userId,
-        bookingId: showRefundModal.bookingId,
-        reason: refundReason,
-      })
-      alert('Yêu cầu hoàn tiền đã được gửi!')
-      setShowRefundModal(null)
-      setRefundReason('')
-      await fetchBookings()
-    } catch (err) {
-      alert(err.response?.data?.message || 'Gửi yêu cầu thất bại')
-    } finally {
-      setSubmittingRefund(false)
-    }
-  }
-
   const filtered = filter === 'ALL'
     ? bookings
     : bookings.filter(b => b.bookingStatus === filter)
@@ -111,33 +77,6 @@ export default function MyBookings() {
     <div style={{ position: 'relative', zIndex: 10, minHeight: '100vh', padding: '5rem 1.5rem 3rem' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '1.5rem' }}>🎫 Vé Của Tôi</h1>
-
-        {/* Refund modal */}
-        {showRefundModal && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
-            onClick={() => setShowRefundModal(null)}>
-            <div style={{ background: '#0D1B2A', border: '1px solid rgba(255,107,157,0.3)', borderRadius: 20, padding: '2rem', width: '100%', maxWidth: 440 }}
-              onClick={e => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <div style={{ color: '#FF6B9D', fontWeight: 800, fontSize: '1.1rem' }}>💸 Yêu cầu hoàn tiền</div>
-                <button onClick={() => setShowRefundModal(null)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
-              </div>
-              <div style={{ color: '#B0A0CC', fontSize: '0.85rem', marginBottom: '1.2rem' }}>
-                Vé <strong style={{ color: 'white', fontFamily: 'monospace' }}>{showRefundModal.bookingCode}</strong> sẽ được hoàn tiền <strong style={{ color: '#FFD700' }}>{Number(showRefundModal.totalPrice).toLocaleString('vi-VN')}₫</strong>
-              </div>
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ color: '#B0A0CC', fontSize: '0.8rem', fontWeight: 600 }}>Lý do hoàn tiền (không bắt buộc)</label>
-                <textarea value={refundReason} onChange={e => setRefundReason(e.target.value)}
-                  style={{ width: '100%', marginTop: '0.4rem', padding: '0.7rem', borderRadius: 10, border: '1px solid rgba(255,107,157,0.3)', background: 'rgba(13,27,42,0.8)', color: 'white', fontSize: '0.85rem', resize: 'vertical', fontFamily: 'inherit', minHeight: 80 }}
-                  placeholder="Nhập lý do hoàn tiền..." />
-              </div>
-              <button onClick={handleRequestRefund} disabled={submittingRefund}
-                style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', padding: '0.75rem', borderRadius: 12, fontWeight: 800, cursor: submittingRefund ? 'wait' : 'pointer', fontFamily: 'inherit', fontSize: '0.95rem', opacity: submittingRefund ? 0.7 : 1 }}>
-                {submittingRefund ? 'Đang gửi...' : 'Gửi yêu cầu'}
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Filter tabs */}
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
@@ -218,18 +157,6 @@ export default function MyBookings() {
                           style={{ background: 'transparent', border: '1px solid rgba(248,113,113,0.4)', color: '#f87171', padding: '0.35rem 1rem', borderRadius: 8, fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Nunito,sans-serif', fontWeight: 700, opacity: cancelling === b.bookingId ? 0.5 : 1 }}>
                           {cancelling === b.bookingId ? 'Đang hủy...' : 'Hủy vé'}
                         </button>
-                      )}
-                      {b.bookingStatus === 'CANCELLED' && b.paymentStatus === 'PAID' && (
-                        <button
-                          onClick={() => setShowRefundModal({ bookingId: b.bookingId, bookingCode: b.bookingCode, totalPrice: b.totalPrice })}
-                          style={{ marginTop: '0.4rem', background: 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', border: 'none', color: 'white', padding: '0.35rem 1rem', borderRadius: 8, fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Nunito,sans-serif', fontWeight: 700 }}>
-                          💸 Yêu cầu hoàn tiền
-                        </button>
-                      )}
-                      {b.paymentStatus === 'REFUNDED' && (
-                        <div style={{ marginTop: '0.4rem', background: 'rgba(192,132,252,0.12)', color: '#c084fc', padding: '0.25rem 0.7rem', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700 }}>
-                          ✅ Đã hoàn tiền
-                        </div>
                       )}
                     </div>
                   </div>

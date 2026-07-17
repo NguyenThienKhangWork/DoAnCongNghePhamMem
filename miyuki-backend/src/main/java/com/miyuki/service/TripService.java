@@ -62,43 +62,11 @@ public class TripService {
             .build();
 
         Trip savedTrip = tripRepository.save(trip);
-        createSeatsForTrip(savedTrip, bus);
+
+        // Tự động tạo ghế dựa trên số ghế của xe
+        generateSeatsForTrip(savedTrip, bus.getTotalSeats());
+
         return savedTrip;
-    }
-
-    private void createSeatsForTrip(Trip trip, Bus bus) {
-        int totalSeats = bus.getTotalSeats();
-        String busType = bus.getBusType().name();
-        List<Seat> seats = new ArrayList<>();
-
-        for (int i = 1; i <= totalSeats; i++) {
-            String seatLabel = String.format("%c%d",
-                (char) ('A' + (i - 1) / 4),
-                (i - 1) % 4 + 1
-            );
-
-            Seat.SeatType seatType;
-            if ("LIMOUSINE".equals(busType)) {
-                seatType = Seat.SeatType.VIP;
-            } else if ("SLEEPER".equals(busType)) {
-                seatType = Seat.SeatType.REGULAR;
-            } else if (i % 4 == 2 || i % 4 == 3) {
-                seatType = Seat.SeatType.WINDOW;
-            } else {
-                seatType = Seat.SeatType.REGULAR;
-            }
-
-            Seat seat = Seat.builder()
-                .trip(trip)
-                .seatNumber(seatLabel)
-                .seatType(seatType)
-                .isAvailable(true)
-                .createdAt(LocalDateTime.now())
-                .build();
-            seats.add(seat);
-        }
-
-        seatRepository.saveAll(seats);
     }
 
     public List<Trip> getPopularRoutes() {
@@ -110,5 +78,56 @@ public class TripService {
 
     public List<Route> getAllRoutes() {
         return routeRepository.findByStatus(Route.RouteStatus.ACTIVE);
+    }
+
+    // ─── Tạo ghế tự động theo số lượng và loại xe ──────────────────────────
+
+    private void generateSeatsForTrip(Trip trip, int totalSeats) {
+        List<Seat> seats = new ArrayList<>();
+
+        // Phân loại ghế theo loại xe:
+        // - LIMOUSINE: tất cả VIP
+        // - SLEEPER: tất cả VIP
+        // - SEAT: 10% đầu là VIP, 20% tiếp theo là WINDOW, còn lại REGULAR
+        Bus.BusType busType = trip.getBus().getBusType();
+
+        for (int i = 1; i <= totalSeats; i++) {
+            Seat.SeatType seatType;
+
+            if (busType == Bus.BusType.LIMOUSINE || busType == Bus.BusType.SLEEPER) {
+                seatType = Seat.SeatType.VIP;
+            } else {
+                // SEAT bus: 10% VIP, 20% WINDOW, 70% REGULAR
+                int vipCount    = Math.max(1, (int) Math.ceil(totalSeats * 0.10));
+                int windowCount = Math.max(1, (int) Math.ceil(totalSeats * 0.20));
+                if (i <= vipCount) {
+                    seatType = Seat.SeatType.VIP;
+                } else if (i <= vipCount + windowCount) {
+                    seatType = Seat.SeatType.WINDOW;
+                } else {
+                    seatType = Seat.SeatType.REGULAR;
+                }
+            }
+
+            String seatNumber = formatSeatNumber(i, totalSeats);
+
+            seats.add(Seat.builder()
+                .trip(trip)
+                .seatNumber(seatNumber)
+                .seatType(seatType)
+                .isAvailable(true)
+                .build());
+        }
+
+        seatRepository.saveAll(seats);
+    }
+
+    private String formatSeatNumber(int index, int total) {
+        // Format: A1, A2... B1, B2... (mỗi hàng 4 ghế)
+        int seatsPerRow = 4;
+        int row = (index - 1) / seatsPerRow;        // 0-based row index
+        int col = (index - 1) % seatsPerRow + 1;    // 1-based column
+        char rowChar = (char) ('A' + row);
+        return rowChar + String.valueOf(col);
     }
 }
