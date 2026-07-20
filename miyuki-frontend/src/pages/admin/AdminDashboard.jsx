@@ -1,5 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  Users, Bus, Ticket, DollarSign, Calendar, Map, Star,
+  Clock, CheckCircle, XCircle, Flower2, AlertTriangle,
+  RefreshCw, Plus, ClipboardList, Zap, ChevronRight
+} from 'lucide-react'
 import { adminService } from '../../services/api'
 
 /* ── helpers ─────────────────────────────────────── */
@@ -12,7 +17,7 @@ const fmtDT = dt => {
 }
 
 /* ── sub-components ──────────────────────────────── */
-function StatCard({ icon, label, value, sub, color, to }) {
+function StatCard({ icon: Icon, label, value, sub, color, to }) {
   const inner = (
     <div style={{
       background: 'rgba(13,27,42,0.95)',
@@ -26,8 +31,8 @@ function StatCard({ icon, label, value, sub, color, to }) {
       onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ fontSize: '2rem' }}>{icon}</div>
-        {to && <span style={{ color: '#7B5FA0', fontSize: '0.75rem' }}>→</span>}
+        <Icon size={32} />
+        {to && <ChevronRight size={12} style={{ color: '#7B5FA0' }} />}
       </div>
       <div style={{ color: '#B0A0CC', fontSize: '0.8rem', fontWeight: 600, margin: '0.5rem 0 0.25rem' }}>{label}</div>
       <div style={{
@@ -44,24 +49,26 @@ function StatCard({ icon, label, value, sub, color, to }) {
 
 function BookingBadge({ status }) {
   const map = {
-    PENDING:   { bg: 'rgba(255,193,7,0.15)',  color: '#FFD700', label: '⏳ Chờ xử lý' },
-    CONFIRMED: { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: '✅ Xác nhận' },
-    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: '❌ Đã huỷ' },
-    COMPLETED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: '✔ Hoàn thành' },
+    PENDING:   { bg: 'rgba(255,193,7,0.15)',  color: '#FFD700', label: 'Chờ xử lý', icon: Clock },
+    CONFIRMED: { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: 'Xác nhận',   icon: CheckCircle },
+    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: 'Đã huỷ',     icon: XCircle },
+    COMPLETED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: 'Hoàn thành',  icon: CheckCircle },
   }
-  const s = map[status] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: status }
-  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.65rem', borderRadius: 20, fontSize: '0.73rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
+  const s = map[status] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: status, icon: null }
+  const Icon = s.icon
+  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.65rem', borderRadius: 20, fontSize: '0.73rem', fontWeight: 700, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>{Icon && <Icon size={12} />}{s.label}</span>
 }
 
 function TripBadge({ status }) {
   const map = {
-    SCHEDULED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: '📅 Lên lịch' },
-    ONGOING:   { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: '🚌 Đang chạy' },
-    COMPLETED: { bg: 'rgba(158,158,158,0.15)',color: '#9E9E9E', label: '✔ Hoàn thành' },
-    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: '❌ Đã huỷ' },
+    SCHEDULED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: 'Lên lịch',  icon: Calendar },
+    ONGOING:   { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: 'Đang chạy',  icon: Bus },
+    COMPLETED: { bg: 'rgba(158,158,158,0.15)',color: '#9E9E9E', label: 'Hoàn thành', icon: CheckCircle },
+    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: 'Đã huỷ',     icon: XCircle },
   }
-  const s = map[status] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: status }
-  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.65rem', borderRadius: 20, fontSize: '0.73rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
+  const s = map[status] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: status, icon: null }
+  const Icon = s.icon
+  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.65rem', borderRadius: 20, fontSize: '0.73rem', fontWeight: 700, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>{Icon && <Icon size={12} />}{s.label}</span>
 }
 
 function SectionCard({ title, children, action }) {
@@ -109,7 +116,7 @@ export default function AdminDashboard() {
 
   if (loading) return (
     <div style={{ textAlign: 'center', color: '#B0A0CC', padding: '5rem 2rem' }}>
-      <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'spin 2s linear infinite', display: 'inline-block' }}>🌸</div>
+      <div style={{ marginBottom: '1rem', animation: 'spin 2s linear infinite', display: 'inline-block' }}><Flower2 size={48} /></div>
       <div style={{ fontSize: '0.9rem' }}>Đang tải dữ liệu...</div>
       <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
     </div>
@@ -117,10 +124,10 @@ export default function AdminDashboard() {
 
   if (error) return (
     <div style={{ textAlign: 'center', padding: '4rem' }}>
-      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+      <div style={{ marginBottom: '1rem' }}><AlertTriangle size={48} /></div>
       <div style={{ color: '#f87171', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{error}</div>
-      <button onClick={load} style={{ background: 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', padding: '0.6rem 1.5rem', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700 }}>
-        🔄 Thử lại
+      <button onClick={load} style={{ background: 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', padding: '0.6rem 1.5rem', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+        <RefreshCw size={16} /> Thử lại
       </button>
     </div>
   )
@@ -132,18 +139,18 @@ export default function AdminDashboard() {
 
       {/* ── KPI row 1 ── */}
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <StatCard icon="👥" label="Tổng người dùng"  value={stats?.totalUsers ?? 0}    to="/admin/users"    />
-        <StatCard icon="🚌" label="Tổng chuyến đi"   value={stats?.totalTrips ?? 0}    to="/admin/trips"    />
-        <StatCard icon="🎫" label="Tổng đặt vé"      value={stats?.totalBookings ?? 0} to="/admin/bookings" />
-        <StatCard icon="💰" label="Doanh thu"         value={fmtVND(revenue)}           color="rgba(255,215,0,0.25)" />
+        <StatCard icon={Users}      label="Tổng người dùng"  value={stats?.totalUsers ?? 0}    to="/admin/users"    />
+        <StatCard icon={Bus}        label="Tổng chuyến đi"   value={stats?.totalTrips ?? 0}    to="/admin/trips"    />
+        <StatCard icon={Ticket}     label="Tổng đặt vé"      value={stats?.totalBookings ?? 0} to="/admin/bookings" />
+        <StatCard icon={DollarSign} label="Doanh thu"         value={fmtVND(revenue)}           color="rgba(255,215,0,0.25)" />
       </div>
 
       {/* ── KPI row 2 ── */}
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <StatCard icon="📅" label="Đặt vé hôm nay"     value={stats?.todayBookings  ?? 0} sub="so với hôm qua" />
-        <StatCard icon="🗺️" label="Tuyến đang hoạt động" value={stats?.activeRoutes  ?? 0} to="/admin/routes" />
-        <StatCard icon="⭐" label="Đánh giá"            value={stats?.totalReviews   ?? 0} to="/admin/reviews" />
-        <StatCard icon="💸" label="Hoàn tiền chờ duyệt" value={stats?.pendingRefunds ?? 0} color="rgba(244,67,54,0.2)" to="/admin/refunds" />
+        <StatCard icon={Calendar}   label="Đặt vé hôm nay"     value={stats?.todayBookings  ?? 0} sub="so với hôm qua" />
+        <StatCard icon={Map}        label="Tuyến đang hoạt động" value={stats?.activeRoutes  ?? 0} to="/admin/routes" />
+        <StatCard icon={Star}       label="Đánh giá"            value={stats?.totalReviews   ?? 0} to="/admin/reviews" />
+        <StatCard icon={DollarSign} label="Hoàn tiền chờ duyệt" value={stats?.pendingRefunds ?? 0} color="rgba(244,67,54,0.2)" to="/admin/refunds" />
       </div>
 
       {/* ── 2-column row ── */}
@@ -151,8 +158,8 @@ export default function AdminDashboard() {
 
         {/* Recent bookings */}
         <SectionCard
-          title="🎫 Đặt vé gần đây"
-          action={<Link to="/admin/bookings" style={{ color: '#FF6B9D', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>Xem tất cả →</Link>}
+          title={<><Ticket size={16} style={{ verticalAlign: 'middle', marginRight: '0.3rem' }} /> Đặt vé gần đây</>}
+          action={<Link to="/admin/bookings" style={{ color: '#FF6B9D', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>Xem tất cả <ChevronRight size={12} /></Link>}
         >
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -180,8 +187,8 @@ export default function AdminDashboard() {
 
         {/* Upcoming trips */}
         <SectionCard
-          title="🚌 Chuyến đi sắp tới"
-          action={<Link to="/admin/trips" style={{ color: '#FF6B9D', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>Xem tất cả →</Link>}
+          title={<><Bus size={16} style={{ verticalAlign: 'middle', marginRight: '0.3rem' }} /> Chuyến đi sắp tới</>}
+          action={<Link to="/admin/trips" style={{ color: '#FF6B9D', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>Xem tất cả <ChevronRight size={12} /></Link>}
         >
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -212,40 +219,43 @@ export default function AdminDashboard() {
 
       {/* ── Quick actions ── */}
       <div style={{ background: 'rgba(13,27,42,0.95)', border: '1px solid rgba(255,107,157,0.2)', borderRadius: 16, padding: '1.25rem 1.5rem' }}>
-        <div style={{ color: 'white', fontWeight: 800, fontSize: '0.95rem', marginBottom: '1rem' }}>⚡ Thao tác nhanh</div>
+        <div style={{ color: 'white', fontWeight: 800, fontSize: '0.95rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Zap size={18} /> Thao tác nhanh</div>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {[
-            { icon: '➕', label: 'Thêm chuyến đi', to: '/admin/trips', color: '#FF6B9D' },
-            { icon: '👥', label: 'Quản lý users', to: '/admin/users', color: '#7B2FBE' },
-            { icon: '💸', label: 'Duyệt hoàn tiền', to: '/admin/refunds', color: '#F44336' },
-            { icon: '📋', label: 'Xem đặt vé', to: '/admin/bookings', color: '#2196F3' },
-            { icon: '🗺️', label: 'Tuyến đường', to: '/admin/routes', color: '#4CAF50' },
-          ].map(a => (
-            <Link key={a.to} to={a.to} style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem',
-              background: `${a.color}18`,
-              border: `1px solid ${a.color}44`,
-              color: a.color,
-              padding: '0.5rem 1.1rem',
-              borderRadius: 10,
-              textDecoration: 'none',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              transition: 'background 0.15s',
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = `${a.color}30`}
-              onMouseLeave={e => e.currentTarget.style.background = `${a.color}18`}
-            >
-              {a.icon} {a.label}
-            </Link>
-          ))}
+            { icon: Plus,         label: 'Thêm chuyến đi', to: '/admin/trips',   color: '#FF6B9D' },
+            { icon: Users,        label: 'Quản lý users',  to: '/admin/users',   color: '#7B2FBE' },
+            { icon: DollarSign,   label: 'Duyệt hoàn tiền', to: '/admin/refunds',color: '#F44336' },
+            { icon: ClipboardList,label: 'Xem đặt vé',     to: '/admin/bookings',color: '#2196F3' },
+            { icon: Map,          label: 'Tuyến đường',    to: '/admin/routes',  color: '#4CAF50' },
+          ].map(a => {
+            const Icon = a.icon
+            return (
+              <Link key={a.to} to={a.to} style={{
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                background: `${a.color}18`,
+                border: `1px solid ${a.color}44`,
+                color: a.color,
+                padding: '0.5rem 1.1rem',
+                borderRadius: 10,
+                textDecoration: 'none',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                transition: 'background 0.15s',
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = `${a.color}30`}
+                onMouseLeave={e => e.currentTarget.style.background = `${a.color}18`}
+              >
+                <Icon size={16} /> {a.label}
+              </Link>
+            )
+          })}
         </div>
       </div>
 
       {/* Refresh footer */}
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button onClick={load} style={{ background: 'transparent', border: '1px solid rgba(255,107,157,0.3)', color: '#FF6B9D', padding: '0.35rem 1rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, fontFamily: 'inherit' }}>
-          🔄 Làm mới
+        <button onClick={load} style={{ background: 'transparent', border: '1px solid rgba(255,107,157,0.3)', color: '#FF6B9D', padding: '0.35rem 1rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+          <RefreshCw size={14} /> Làm mới
         </button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { Flower2, Settings, Ticket } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
@@ -21,7 +22,7 @@ export default function Navbar() {
           borderRadius: 12,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '1.2rem'
-        }}>🌸</div>
+        }}><Flower2 size={20} /></div>
         <div>
           <div style={{ fontFamily: 'sans-serif', fontSize: '0.75rem', color: '#FF6B9D', letterSpacing: 2 }}>みゆき エクスプレス</div>
           <div style={{ color: 'white', fontWeight: 900, fontSize: '1rem', lineHeight: 1.1 }}>MiYuki Express</div>
@@ -41,7 +42,7 @@ export default function Navbar() {
           <li><Link to="/profile" style={{ color: '#B0A0CC', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Tài khoản</Link></li>
         )}
         {token && (
-          <li><Link to="/admin" style={{ color: '#FF6B9D', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem' }}>⚙️ Admin</Link></li>
+          <li><Link to="/admin" style={{ color: '#FF6B9D', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><Settings size={16} /> Admin</Link></li>
         )}
         {token ? (
           <li>
@@ -60,8 +61,8 @@ export default function Navbar() {
               color: 'white', textDecoration: 'none',
               padding: '0.5rem 1.4rem', borderRadius: 50,
               fontWeight: 800, fontSize: '0.88rem',
-              display: 'inline-block'
-            }}>🎫 Đặt ngay</Link>
+              display: 'inline-flex', alignItems: 'center', gap: '0.4rem'
+            }}><Ticket size={16} /> Đặt ngay</Link>
           </li>
         )}
       </ul>

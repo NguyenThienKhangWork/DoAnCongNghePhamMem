@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Flower2, AlertTriangle, User, Lock, EyeOff, Eye, Clock, Rocket, ChevronLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function AdminLoginPage() {
@@ -90,7 +91,7 @@ export default function AdminLoginPage() {
             borderRadius: 18, fontSize: '1.8rem',
             marginBottom: '1rem',
             boxShadow: '0 8px 24px rgba(255,107,157,0.35)',
-          }}>🌸</div>
+          }}><Flower2 size={28} /></div>
           <div style={{ color: '#FF6B9D', fontSize: '0.7rem', letterSpacing: 3, fontWeight: 700, marginBottom: '0.4rem', textTransform: 'uppercase' }}>
             Admin Portal
           </div>
@@ -116,7 +117,7 @@ export default function AdminLoginPage() {
             alignItems: 'flex-start',
             gap: '0.5rem',
           }}>
-            <span style={{ flexShrink: 0 }}>⚠️</span>
+            <span style={{ flexShrink: 0 }}><AlertTriangle size={16} /></span>
             <span>{error}</span>
           </div>
         )}
@@ -131,8 +132,8 @@ export default function AdminLoginPage() {
             <div style={{ position: 'relative' }}>
               <span style={{
                 position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)',
-                fontSize: '1rem', pointerEvents: 'none',
-              }}>👤</span>
+                pointerEvents: 'none',
+              }}><User size={18} /></span>
               <input
                 type="email"
                 value={email}
@@ -165,8 +166,8 @@ export default function AdminLoginPage() {
             <div style={{ position: 'relative' }}>
               <span style={{
                 position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)',
-                fontSize: '1rem', pointerEvents: 'none',
-              }}>🔒</span>
+                pointerEvents: 'none',
+              }}><Lock size={18} /></span>
               <input
                 type={showPass ? 'text' : 'password'}
                 value={password}
@@ -196,7 +197,7 @@ export default function AdminLoginPage() {
                   background: 'none', border: 'none', cursor: 'pointer',
                   color: '#7B5FA0', fontSize: '0.9rem', padding: 0,
                 }}
-              >{showPass ? '🙈' : '👁️'}</button>
+                >{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
             </div>
           </div>
 
@@ -227,11 +228,11 @@ export default function AdminLoginPage() {
           >
             {loading ? (
               <>
-                <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⏳</span>
+                <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}><Clock size={18} /></span>
                 Đang xác thực...
               </>
             ) : (
-              <>🚀 Đăng nhập Admin</>
+              <><Rocket size={18} /> Đăng nhập Admin</>
             )}
           </button>
         </form>
@@ -247,7 +248,7 @@ export default function AdminLoginPage() {
               display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
             }}
           >
-            ← Về trang chủ
+            <ChevronLeft size={14} /> Về trang chủ
           </a>
         </div>
 
@@ -262,7 +263,7 @@ export default function AdminLoginPage() {
           alignItems: 'flex-start',
           gap: '0.5rem',
         }}>
-          <span style={{ flexShrink: 0 }}>🔐</span>
+          <span style={{ flexShrink: 0 }}><Lock size={16} /></span>
           <span style={{ color: '#7B5FA0', fontSize: '0.78rem', lineHeight: 1.4 }}>
             Trang này chỉ dành cho quản trị viên hệ thống. Mọi truy cập trái phép đều được ghi lại.
           </span>

@@ -1,15 +1,16 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { LayoutDashboard, Users, Bus, Ticket, Map, Star, Bell, DollarSign, Flower2, LogOut, ChevronLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const menuItems = [
-  { icon: '📊', label: 'Dashboard',    path: '/admin' },
-  { icon: '👥', label: 'Người dùng',   path: '/admin/users' },
-  { icon: '🚌', label: 'Chuyến đi',    path: '/admin/trips' },
-  { icon: '🎫', label: 'Đặt vé',       path: '/admin/bookings' },
-  { icon: '🗺️', label: 'Tuyến đường',  path: '/admin/routes' },
-  { icon: '⭐', label: 'Đánh giá',     path: '/admin/reviews' },
-  { icon: '🔔', label: 'Thông báo',    path: '/admin/notifications' },
-  { icon: '💸', label: 'Hoàn tiền',    path: '/admin/refunds' },
+  { icon: LayoutDashboard, label: 'Dashboard',    path: '/admin' },
+  { icon: Users,           label: 'Người dùng',   path: '/admin/users' },
+  { icon: Bus,             label: 'Chuyến đi',    path: '/admin/trips' },
+  { icon: Ticket,          label: 'Đặt vé',       path: '/admin/bookings' },
+  { icon: Map,             label: 'Tuyến đường',  path: '/admin/routes' },
+  { icon: Star,            label: 'Đánh giá',     path: '/admin/reviews' },
+  { icon: Bell,            label: 'Thông báo',    path: '/admin/notifications' },
+  { icon: DollarSign,      label: 'Hoàn tiền',    path: '/admin/refunds' },
 ]
 
 export default function AdminLayout() {
@@ -56,7 +57,7 @@ export default function AdminLayout() {
               borderRadius: 10,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '1.1rem'
-            }}>🌸</div>
+            }}><Flower2 size={20} /></div>
             <div>
               <div style={{ color: '#FF6B9D', fontSize: '0.65rem', letterSpacing: 2, fontFamily: 'sans-serif' }}>ADMIN</div>
               <div style={{ color: 'white', fontWeight: 900, fontSize: '0.95rem' }}>MiYuki Express</div>
@@ -92,7 +93,7 @@ export default function AdminLayout() {
                   transition: 'all 0.2s',
                 }}
               >
-                <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+                <item.icon size={20} />
                 {item.label}
               </Link>
             )
@@ -141,7 +142,7 @@ export default function AdminLayout() {
             onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,67,54,0.2)'}
             onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,67,54,0.1)'}
           >
-            🚪 Đăng xuất
+            <LogOut size={14} /> Đăng xuất
           </button>
         </div>
       </aside>
@@ -163,7 +164,7 @@ export default function AdminLayout() {
           <div>
             <div style={{ color: '#7B5FA0', fontSize: '0.75rem', letterSpacing: 1, textTransform: 'uppercase' }}>Admin Panel</div>
             <h1 style={{ color: 'white', fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>
-              {currentPage?.icon} {currentPage?.label || 'Dashboard'}
+              {currentPage?.icon && <currentPage.icon size={20} style={{ verticalAlign: 'middle', marginRight: '0.3rem' }} />} {currentPage?.label || 'Dashboard'}
             </h1>
           </div>
           <Link to="/" style={{
@@ -178,7 +179,7 @@ export default function AdminLayout() {
             alignItems: 'center',
             gap: '0.3rem',
           }}>
-            ← Về trang chủ
+            <ChevronLeft size={16} /> Về trang chủ
           </Link>
         </header>
 

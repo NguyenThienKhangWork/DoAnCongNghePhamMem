@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Bell, Mail, Check } from 'lucide-react'
 import { adminService } from '../../services/api'
 import { th, td, TableCard, LoadingRow, EmptyRow, FilterTabs, Pagination } from '../../components/admin/AdminTable'
 
@@ -35,14 +36,14 @@ export default function AdminNotifications() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <div style={{ background: 'rgba(13,27,42,0.95)', border: '1px solid rgba(255,107,157,0.2)', borderRadius: 12, padding: '0.8rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ fontSize: '1.4rem' }}>🔔</span>
+            <Bell size={24} />
             <div>
               <div style={{ color: '#B0A0CC', fontSize: '0.72rem' }}>Tổng thông báo</div>
               <div style={{ color: '#FF6B9D', fontWeight: 900, fontSize: '1.1rem' }}>{totalElements}</div>
             </div>
           </div>
           <div style={{ background: 'rgba(13,27,42,0.95)', border: '1px solid rgba(255,107,157,0.2)', borderRadius: 12, padding: '0.8rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ fontSize: '1.4rem' }}>📬</span>
+            <Mail size={24} />
             <div>
               <div style={{ color: '#B0A0CC', fontSize: '0.72rem' }}>Chưa đọc (trang này)</div>
               <div style={{ color: '#FFD700', fontWeight: 900, fontSize: '1.1rem' }}>{unreadCount}</div>
@@ -58,7 +59,7 @@ export default function AdminNotifications() {
             <tr>{['ID', 'Người nhận', 'Loại', 'Tiêu đề', 'Nội dung', 'Trạng thái', 'Ngày'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
           </thead>
           <tbody>
-            {loading ? <LoadingRow colSpan={7} /> : filtered.length === 0 ? <EmptyRow colSpan={7} message="Không có thông báo" icon="🔔" /> : filtered.map((n, i) => {
+            {loading ? <LoadingRow colSpan={7} /> : filtered.length === 0 ? <EmptyRow colSpan={7} message="Không có thông báo" icon={<Bell size={32} />} /> : filtered.map((n, i) => {
               const t = TYPE_MAP[n.notificationType] || { label: n.notificationType, color: '#fff', bg: 'rgba(255,255,255,0.08)' }
               return (
                 <tr key={n.notificationId} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)' }}>
@@ -68,8 +69,8 @@ export default function AdminNotifications() {
                   <td style={{ ...td(), color: 'white', maxWidth: 180 }}>{n.title || '-'}</td>
                   <td style={{ ...td(), maxWidth: 260, color: '#B0A0CC', fontSize: '0.78rem' }}>{n.message ? n.message.substring(0, 80) + (n.message.length > 80 ? '...' : '') : '-'}</td>
                   <td style={td()}>
-                    <span style={{ background: n.isRead ? 'rgba(76,175,80,0.12)' : 'rgba(255,152,0,0.12)', color: n.isRead ? '#4CAF50' : '#FF9800', padding: '0.2rem 0.6rem', borderRadius: 10, fontSize: '0.72rem', fontWeight: 700 }}>
-                      {n.isRead ? '✓ Đã đọc' : '● Chưa đọc'}
+                    <span style={{ background: n.isRead ? 'rgba(76,175,80,0.12)' : 'rgba(255,152,0,0.12)', color: n.isRead ? '#4CAF50' : '#FF9800', padding: '0.2rem 0.6rem', borderRadius: 10, fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                      {n.isRead ? <><Check size={12} /> Đã đọc</> : <><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#FF9800' }} /> Chưa đọc</>}
                     </span>
                   </td>
                   <td style={td()}>{n.createdAt ? new Date(n.createdAt).toLocaleDateString('vi-VN') : '-'}</td>

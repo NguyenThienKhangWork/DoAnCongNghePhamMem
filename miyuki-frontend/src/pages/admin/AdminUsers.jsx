@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Search, UserX, Eye, Clock, Lock, Unlock, X } from 'lucide-react'
 import { adminService } from '../../services/api'
 import { th, td, TableCard, LoadingRow, EmptyRow, ErrorBanner, FilterTabs, RefreshButton, Pagination } from '../../components/admin/AdminTable'
 
@@ -46,7 +47,7 @@ function UserDetailModal({ user, onClose }) {
               <div style={{ color: '#7B5FA0', fontSize: '0.78rem' }}>#{user.userId}</div>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
         </div>
         {row('Email', user.email)}
         {row('Số điện thoại', user.phone)}
@@ -106,7 +107,7 @@ export default function AdminUsers() {
 
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: '1 1 260px', maxWidth: 360 }}>
-          <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#7B5FA0', pointerEvents: 'none' }}>🔍</span>
+          <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#7B5FA0', pointerEvents: 'none' }}><Search size={16} /></span>
           <input type="text" placeholder="Tìm tên, email, SĐT..." value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(13,27,42,0.95)', border: '1px solid rgba(255,107,157,0.3)', borderRadius: 10, padding: '0.6rem 1rem 0.6rem 2.5rem', color: 'white', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit' }} />
@@ -126,7 +127,7 @@ export default function AdminUsers() {
             <tr>{['ID', 'Người dùng', 'Email', 'SĐT', 'Vai trò', 'Trạng thái', 'Ngày tạo', 'Hành động'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
           </thead>
           <tbody>
-            {loading ? <LoadingRow colSpan={8} /> : users.length === 0 ? <EmptyRow colSpan={8} icon="😶" message="Không tìm thấy người dùng nào" /> : users.map((u, i) => (
+            {loading ? <LoadingRow colSpan={8} /> : users.length === 0 ? <EmptyRow colSpan={8} icon={<UserX size={32} />} message="Không tìm thấy người dùng nào" /> : users.map((u, i) => (
               <tr key={u.userId} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.012)' }}>
                 <td style={{ ...td(), color: '#FF6B9D', fontWeight: 700 }}>#{u.userId}</td>
                 <td style={td()}>
@@ -144,12 +145,12 @@ export default function AdminUsers() {
                 <td style={{ ...td(), color: '#B0A0CC', fontSize: '0.8rem' }}>{fmtDate(u.createdAt)}</td>
                 <td style={{ ...td(), textAlign: 'center' }}>
                   <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center' }}>
-                    <button onClick={() => setDetail(u)} style={{ background: 'rgba(33,150,243,0.12)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.35)', padding: '0.28rem 0.65rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'inherit' }}>
-                      👁 Chi tiết
+                    <button onClick={() => setDetail(u)} style={{ background: 'rgba(33,150,243,0.12)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.35)', padding: '0.28rem 0.65rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Eye size={14} /> Chi tiết
                     </button>
                     <button disabled={toggling === u.userId} onClick={() => handleToggle(u)}
                       style={{ background: u.status === 'ACTIVE' ? 'rgba(244,67,54,0.12)' : 'rgba(76,175,80,0.12)', color: u.status === 'ACTIVE' ? '#F44336' : '#4CAF50', border: `1px solid ${u.status === 'ACTIVE' ? 'rgba(244,67,54,0.35)' : 'rgba(76,175,80,0.35)'}`, padding: '0.28rem 0.65rem', borderRadius: 7, cursor: toggling === u.userId ? 'not-allowed' : 'pointer', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'inherit', opacity: toggling === u.userId ? 0.5 : 1 }}>
-                      {toggling === u.userId ? '⏳' : u.status === 'ACTIVE' ? '🔒 Khoá' : '🔓 Mở khoá'}
+                      {toggling === u.userId ? <><Clock size={14} /> Đang xử lý</> : u.status === 'ACTIVE' ? <><Lock size={14} /> Khoá</> : <><Unlock size={14} /> Mở khoá</>}
                     </button>
                   </div>
                 </td>
