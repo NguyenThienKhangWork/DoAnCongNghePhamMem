@@ -110,7 +110,8 @@ public class AdminController {
     public ResponseEntity<Trip> createTrip(@RequestBody CreateTripRequest request) {
         Trip trip = tripService.createTrip(
                 request.getRouteId(), request.getBusId(),
-                request.getDepartureTime(), request.getArrivalTime(), request.getPrice());
+                request.getDepartureTime(), request.getArrivalTime(), request.getPrice(),
+                request.getVipSeats(), request.getWindowSeats(), request.getRegularSeats());
         return ResponseEntity.ok(trip);
     }
 
