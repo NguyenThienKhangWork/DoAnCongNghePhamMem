@@ -1,3 +1,5 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
 const btnPage = (active, disabled) => ({
   padding: '0.35rem 0.75rem', borderRadius: 8, fontWeight: 600, fontSize: '0.8rem',
   cursor: disabled ? 'not-allowed' : 'pointer',
@@ -14,11 +16,11 @@ export default function Pagination({ page, totalPages, onChange }) {
   const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i)
   return (
     <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', justifyContent: 'center', padding: '0.9rem 0' }}>
-      <button onClick={() => onChange(page - 1)} disabled={page === 0} style={btnPage(false, page === 0)}>← Trước</button>
+      <button onClick={() => onChange(page - 1)} disabled={page === 0} style={btnPage(false, page === 0)}><ChevronLeft size={14} /> Trước</button>
       {start > 0 && <span style={{ color: '#555' }}>…</span>}
       {pages.map(p => <button key={p} onClick={() => onChange(p)} style={btnPage(p === page, false)}>{p + 1}</button>)}
       {end < totalPages - 1 && <span style={{ color: '#555' }}>…</span>}
-      <button onClick={() => onChange(page + 1)} disabled={page >= totalPages - 1} style={btnPage(false, page >= totalPages - 1)}>Tiếp →</button>
+      <button onClick={() => onChange(page + 1)} disabled={page >= totalPages - 1} style={btnPage(false, page >= totalPages - 1)}>Tiếp <ChevronRight size={14} /></button>
     </div>
   )
 }

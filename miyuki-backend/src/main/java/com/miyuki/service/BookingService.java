@@ -38,8 +38,10 @@ public class BookingService {
             throw new RuntimeException("Không đủ ghế trống");
         }
 
-        // Kiểm tra tất cả ghế còn trống trước khi đặt (dùng lock để tránh race condition)
-        List<Seat> seats = seatIds.stream()
+        // Sắp xếp seatIds trước khi lock để tránh deadlock
+        List<Long> sortedSeatIds = seatIds.stream().sorted().toList();
+
+        List<Seat> seats = sortedSeatIds.stream()
             .map(id -> seatRepository.findByIdWithLock(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ghế không tồn tại: " + id)))
             .toList();

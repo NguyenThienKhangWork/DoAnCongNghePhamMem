@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
+import { Star, BarChart3 } from 'lucide-react'
 import { adminService } from '../../services/api'
 import { th, td, TableCard, LoadingRow, EmptyRow, Pagination } from '../../components/admin/AdminTable'
 
 function Stars({ rating }) {
-  return <span style={{ color: '#FFD700', fontSize: '0.9rem' }}>
-    {'⭐'.repeat(rating || 0)}{'☆'.repeat(5 - (rating || 0))}
+  return <span style={{ color: '#FFD700', display: 'inline-flex', gap: '1px', verticalAlign: 'middle' }}>
+    {[1,2,3,4,5].map(i => (
+      <Star key={i} size={14} fill={i <= (rating || 0) ? '#FFD700' : 'none'} stroke={i <= (rating || 0) ? '#FFD700' : '#555'} />
+    ))}
   </span>
 }
 
-function StatsCard({ icon, label, value }) {
+function StatsCard({ icon: Icon, label, value }) {
   return (
     <div style={{ flex: '1 1 200px', background: 'rgba(13,27,42,0.95)', border: '1px solid rgba(255,107,157,0.2)', borderRadius: 12, padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-      <span style={{ fontSize: '1.6rem' }}>{icon}</span>
+      <Icon size={24} />
       <div>
         <div style={{ color: '#B0A0CC', fontSize: '0.75rem', fontWeight: 600 }}>{label}</div>
         <div style={{ fontSize: '1.3rem', fontWeight: 900, background: 'linear-gradient(135deg,#FF6B9D,#FFD700)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{value}</div>
@@ -41,8 +44,8 @@ export default function AdminReviews() {
   return (
     <div>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        <StatsCard icon="⭐" label="Tổng đánh giá" value={totalElements} />
-        <StatsCard icon="📊" label="Điểm TB trang hiện tại" value={avgRating + ' / 5'} />
+        <StatsCard icon={Star} label="Tổng đánh giá" value={totalElements} />
+        <StatsCard icon={BarChart3} label="Điểm TB trang hiện tại" value={avgRating + ' / 5'} />
       </div>
 
       <TableCard>
@@ -51,7 +54,7 @@ export default function AdminReviews() {
             <tr>{['ID', 'Khách hàng', 'Tuyến đường', 'Sao', 'Nhận xét', 'Ngày'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
           </thead>
           <tbody>
-            {loading ? <LoadingRow colSpan={6} /> : reviews.length === 0 ? <EmptyRow colSpan={6} message="Chưa có đánh giá" icon="⭐" /> : reviews.map((r, i) => (
+            {loading ? <LoadingRow colSpan={6} /> : reviews.length === 0 ? <EmptyRow colSpan={6} message="Chưa có đánh giá" icon={<Star size={32} />} /> : reviews.map((r, i) => (
               <tr key={r.reviewId} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)' }}>
                 <td style={{ ...td(), color: '#FF6B9D', fontWeight: 700 }}>#{r.reviewId}</td>
                 <td style={{ ...td(), color: 'white', fontWeight: 600 }}>{r.user?.fullName || '-'}</td>

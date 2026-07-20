@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Ticket, CheckCircle, Clock, DollarSign, Eye, X } from 'lucide-react'
 import { adminService } from '../../services/api'
 import { th, td, TableCard, LoadingRow, EmptyRow, ErrorBanner, FilterTabs, RefreshButton, Pagination } from '../../components/admin/AdminTable'
 
@@ -12,13 +13,14 @@ const fmtDT = dt => {
 
 function BookingBadge({ status }) {
   const map = {
-    PENDING:   { bg: 'rgba(255,193,7,0.15)',  color: '#FFD700', label: '⏳ Chờ xử lý' },
-    CONFIRMED: { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: '✅ Xác nhận' },
-    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: '❌ Đã huỷ' },
-    COMPLETED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: '✔ Hoàn thành' },
+    PENDING:   { bg: 'rgba(255,193,7,0.15)',  color: '#FFD700', label: 'Chờ xử lý', icon: Clock },
+    CONFIRMED: { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: 'Xác nhận',   icon: CheckCircle },
+    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: 'Đã huỷ',     icon: X },
+    COMPLETED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: 'Hoàn thành',  icon: CheckCircle },
   }
-  const s = map[status] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: status }
-  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.7rem', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700 }}>{s.label}</span>
+  const s = map[status] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: status, icon: null }
+  const Icon = s.icon
+  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.7rem', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>{Icon && <Icon size={12} />}{s.label}</span>
 }
 
 function PaymentBadge({ status }) {
@@ -31,10 +33,10 @@ function PaymentBadge({ status }) {
   return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.7rem', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700 }}>{s.label}</span>
 }
 
-function StatsCard({ icon, label, value, color }) {
+function StatsCard({ icon: Icon, label, value, color }) {
   return (
     <div style={{ flex: 1, minWidth: 150, background: 'rgba(13,27,42,0.95)', border: `1px solid ${color || 'rgba(255,107,157,0.2)'}`, borderRadius: 12, padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-      <span style={{ fontSize: '1.6rem' }}>{icon}</span>
+      <Icon size={24} />
       <div>
         <div style={{ color: '#B0A0CC', fontSize: '0.72rem', fontWeight: 600 }}>{label}</div>
         <div style={{ fontSize: '1.3rem', fontWeight: 900, background: 'linear-gradient(135deg,#FF6B9D,#FFD700)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{value}</div>
@@ -62,7 +64,7 @@ function BookingDetailModal({ booking, onClose, onAction, updating }) {
             <div style={{ color: '#FF6B9D', fontSize: '0.72rem', fontWeight: 700, letterSpacing: 1 }}>MÃ VÉ</div>
             <div style={{ color: 'white', fontWeight: 800, fontSize: '1.2rem', fontFamily: 'monospace', marginTop: '0.15rem' }}>{booking.bookingCode}</div>
           </div>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
         </div>
         {row('Khách hàng', booking.user?.fullName || '-')}
         {row('Email', booking.user?.email || '-')}
@@ -115,10 +117,10 @@ export default function AdminBookings() {
 
   const nextActions = (b) => {
     const acts = []
-    if (b.bookingStatus === 'PENDING') acts.push(['CONFIRMED', '✅ Xác nhận', '#4CAF50'])
-    if (b.bookingStatus === 'PENDING') acts.push(['CANCELLED', '❌ Huỷ', '#F44336'])
-    if (b.bookingStatus === 'CONFIRMED') acts.push(['COMPLETED', '✔ Hoàn thành', '#2196F3'])
-    if (b.bookingStatus === 'CONFIRMED') acts.push(['CANCELLED', '❌ Huỷ', '#F44336'])
+    if (b.bookingStatus === 'PENDING') acts.push(['CONFIRMED', 'Xác nhận', '#4CAF50', CheckCircle])
+    if (b.bookingStatus === 'PENDING') acts.push(['CANCELLED', 'Huỷ', '#F44336', X])
+    if (b.bookingStatus === 'CONFIRMED') acts.push(['COMPLETED', 'Hoàn thành', '#2196F3', CheckCircle])
+    if (b.bookingStatus === 'CONFIRMED') acts.push(['CANCELLED', 'Huỷ', '#F44336', X])
     return acts
   }
 
@@ -127,10 +129,10 @@ export default function AdminBookings() {
       <BookingDetailModal booking={detail} onClose={() => setDetail(null)} onAction={handleAction} updating={updating} />
 
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-        <StatsCard icon="🎫" label="Tổng vé" value={stats?.totalBookings ?? totalElements} />
-        <StatsCard icon="✅" label="Đã xác nhận" value={stats?.confirmedBookings ?? 0} color="rgba(76,175,80,0.3)" />
-        <StatsCard icon="⏳" label="Đang chờ" value={stats?.pendingBookings ?? 0} color="rgba(255,215,0,0.3)" />
-        <StatsCard icon="💰" label="Doanh thu" value={fmtVND(stats?.totalRevenue)} color="rgba(255,215,0,0.3)" />
+        <StatsCard icon={Ticket}     label="Tổng vé"    value={stats?.totalBookings ?? totalElements} />
+        <StatsCard icon={CheckCircle} label="Đã xác nhận" value={stats?.confirmedBookings ?? 0} color="rgba(76,175,80,0.3)" />
+        <StatsCard icon={Clock}      label="Đang chờ"   value={stats?.pendingBookings ?? 0} color="rgba(255,215,0,0.3)" />
+        <StatsCard icon={DollarSign} label="Doanh thu"  value={fmtVND(stats?.totalRevenue)} color="rgba(255,215,0,0.3)" />
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap' }}>
@@ -148,7 +150,7 @@ export default function AdminBookings() {
             <tr>{['Mã vé', 'Khách hàng', 'Tuyến đường', 'Ngày đi', 'Tổng tiền', 'Trạng thái', 'Thanh toán', 'Thao tác'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
           </thead>
           <tbody>
-            {loading ? <LoadingRow colSpan={8} /> : bookings.length === 0 ? <EmptyRow colSpan={8} message="Không có đặt vé" icon="🎫" /> : bookings.map((b, i) => (
+            {loading ? <LoadingRow colSpan={8} /> : bookings.length === 0 ? <EmptyRow colSpan={8} message="Không có đặt vé" icon={<Ticket size={32} />} /> : bookings.map((b, i) => (
               <tr key={b.bookingId} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)' }}>
                 <td style={{ ...td(), color: '#FF6B9D', fontWeight: 700, fontFamily: 'monospace', cursor: 'pointer' }}
                   onClick={() => setDetail(b)}>{b.bookingCode}</td>
@@ -161,14 +163,14 @@ export default function AdminBookings() {
                 <td style={{ padding: '0.5rem 1rem' }}>
                   <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
                     <button onClick={() => setDetail(b)}
-                      style={{ background: 'rgba(33,150,243,0.12)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.35)', padding: '0.25rem 0.6rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, fontFamily: 'inherit' }}>
-                      👁 Xem
+                      style={{ background: 'rgba(33,150,243,0.12)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.35)', padding: '0.25rem 0.6rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                      <Eye size={14} /> Xem
                     </button>
-                    {nextActions(b).map(([status, label, color]) => (
+                    {nextActions(b).map(([status, label, color, Icon]) => (
                       <button key={status} disabled={updating === b.bookingId}
                         onClick={() => handleAction(b.bookingId, status, label)}
-                        style={{ background: `${color}18`, color, border: `1px solid ${color}44`, padding: '0.25rem 0.6rem', borderRadius: 7, cursor: updating === b.bookingId ? 'not-allowed' : 'pointer', fontSize: '0.72rem', fontWeight: 700, fontFamily: 'inherit', opacity: updating === b.bookingId ? 0.5 : 1 }}>
-                        {updating === b.bookingId ? '⏳' : label}
+                        style={{ background: `${color}18`, color, border: `1px solid ${color}44`, padding: '0.25rem 0.6rem', borderRadius: 7, cursor: updating === b.bookingId ? 'not-allowed' : 'pointer', fontSize: '0.72rem', fontWeight: 700, fontFamily: 'inherit', opacity: updating === b.bookingId ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                        {updating === b.bookingId ? <><Clock size={12} /> Đang xử lý</> : <><Icon size={12} /> {label}</>}
                       </button>
                     ))}
                   </div>

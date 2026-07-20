@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Calendar, Bus, CheckCircle, XCircle, Star, PanelRight, Armchair, Pencil, Plus, X, AlertTriangle, Check, Lightbulb, Clock, Save, Eye } from 'lucide-react'
 import { adminService } from '../../services/api'
 import { th, td, TableCard, LoadingRow, EmptyRow, ErrorBanner, FilterTabs, RefreshButton, Pagination } from '../../components/admin/AdminTable'
 
@@ -17,20 +18,21 @@ const inp = {
 
 function StatusBadge({ status }) {
   const map = {
-    SCHEDULED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: '📅 Đã lên lịch' },
-    ONGOING:   { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: '🚌 Đang chạy' },
-    COMPLETED: { bg: 'rgba(158,158,158,0.15)',color: '#9E9E9E', label: '✔ Hoàn thành' },
-    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: '❌ Đã huỷ' },
+    SCHEDULED: { bg: 'rgba(33,150,243,0.15)', color: '#2196F3', label: 'Đã lên lịch', icon: Calendar },
+    ONGOING:   { bg: 'rgba(76,175,80,0.15)',  color: '#4CAF50', label: 'Đang chạy',   icon: Bus },
+    COMPLETED: { bg: 'rgba(158,158,158,0.15)',color: '#9E9E9E', label: 'Hoàn thành',  icon: CheckCircle },
+    CANCELLED: { bg: 'rgba(244,67,54,0.15)',  color: '#F44336', label: 'Đã huỷ',      icon: XCircle },
   }
-  const s = map[status] || { bg: 'rgba(255,255,255,0.08)', color: '#ccc', label: status }
-  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.65rem', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
+  const s = map[status] || { bg: 'rgba(255,255,255,0.08)', color: '#ccc', label: status, icon: null }
+  const Icon = s.icon
+  return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.65rem', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>{Icon && <Icon size={12} />}{s.label}</span>
 }
 
 // Label màu loại ghế
 const SEAT_TYPE_COLORS = {
-  VIP:     { bg: 'rgba(255,193,7,0.15)',  border: 'rgba(255,193,7,0.5)',  color: '#FFC107', icon: '⭐' },
-  WINDOW:  { bg: 'rgba(33,150,243,0.15)', border: 'rgba(33,150,243,0.5)', color: '#2196F3', icon: '🪟' },
-  REGULAR: { bg: 'rgba(76,175,80,0.15)',  border: 'rgba(76,175,80,0.5)',  color: '#4CAF50', icon: '💺' },
+  VIP:     { bg: 'rgba(255,193,7,0.15)',  border: 'rgba(255,193,7,0.5)',  color: '#FFC107', icon: Star },
+  WINDOW:  { bg: 'rgba(33,150,243,0.15)', border: 'rgba(33,150,243,0.5)', color: '#2196F3', icon: PanelRight },
+  REGULAR: { bg: 'rgba(76,175,80,0.15)',  border: 'rgba(76,175,80,0.5)',  color: '#4CAF50', icon: Armchair },
 }
 
 function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
@@ -86,8 +88,8 @@ function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
   return (
     <div style={{ background: 'rgba(13,27,42,0.98)', border: '1px solid rgba(255,107,157,0.3)', borderRadius: 16, padding: '1.5rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-        <h3 style={{ color: 'white', margin: 0, fontWeight: 800 }}>{initial?.tripId ? '✏️ Cập nhật chuyến đi' : '➕ Thêm chuyến mới'}</h3>
-        <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 30, height: 30, borderRadius: '50%', cursor: 'pointer', fontSize: '0.9rem' }}>✕</button>
+        <h3 style={{ color: 'white', margin: 0, fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>{initial?.tripId ? <><Pencil size={18} /> Cập nhật chuyến đi</> : <><Plus size={18} /> Thêm chuyến mới</>}</h3>
+        <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 30, height: 30, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -125,7 +127,7 @@ function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
         {selectedBus && (
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,107,157,0.2)', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <span style={{ color: 'white', fontWeight: 700, fontSize: '0.88rem' }}>🪑 Cấu hình ghế</span>
+              <span style={{ color: 'white', fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Armchair size={16} /> Cấu hình ghế</span>
               <span style={{ fontSize: '0.75rem', color: '#B0A0CC' }}>
                 Sức chứa: <strong style={{ color: 'white' }}>{busTotal} ghế</strong>
                 {busType && <span style={{ marginLeft: '0.5rem', background: 'rgba(255,107,157,0.15)', color: '#FF6B9D', padding: '0.1rem 0.5rem', borderRadius: 20, fontSize: '0.7rem' }}>{busType}</span>}
@@ -143,7 +145,7 @@ function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
                   <div key={key}>
                     <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.3rem' }}>
                       <span style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.color, borderRadius: 6, padding: '0.1rem 0.4rem', fontSize: '0.7rem' }}>
-                        {c.icon} {type}
+                        <c.icon size={12} /> {type}
                       </span>
                     </label>
                     <input
@@ -169,7 +171,7 @@ function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
                   <span style={{ color: overLimit ? '#f87171' : '#4ade80', fontWeight: 700 }}>
-                    {overLimit ? `⚠ Vượt ${filledTotal - busTotal} ghế` : `✓ ${filledTotal}/${busTotal} ghế đã phân bổ`}
+                    {overLimit ? <><AlertTriangle size={12} /> Vượt {filledTotal - busTotal} ghế</> : <><Check size={12} /> {filledTotal}/{busTotal} ghế đã phân bổ</>}
                   </span>
                   {!overLimit && remaining > 0 && (
                     <span style={{ color: '#B0A0CC' }}>Còn trống: {remaining} ghế</span>
@@ -178,14 +180,14 @@ function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
               </div>
             ) : (
               <div style={{ fontSize: '0.75rem', color: '#B0A0CC', fontStyle: 'italic' }}>
-                💡 Để trống → {autoHint}
+                <Lightbulb size={12} /> Để trống → {autoHint}
               </div>
             )}
           </div>
         )}
 
         <button type="submit" disabled={saving || overLimit} style={{ width: '100%', background: (saving || overLimit) ? 'rgba(123,47,190,0.4)' : 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', borderRadius: 10, padding: '0.65rem', fontWeight: 800, fontSize: '0.9rem', cursor: (saving || overLimit) ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
-          {saving ? '⏳ Đang lưu...' : initial?.tripId ? '💾 Cập nhật' : '✅ Tạo chuyến'}
+          {saving ? <><Clock size={16} /> Đang lưu...</> : initial?.tripId ? <><Save size={16} /> Cập nhật</> : <><CheckCircle size={16} /> Tạo chuyến</>}
         </button>
       </form>
     </div>
@@ -223,7 +225,7 @@ function TripDetailModal({ trip, onClose, onChangeStatus }) {
               {trip.route ? `${trip.route.departureCity} → ${trip.route.destinationCity}` : 'N/A'}
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
         </div>
         {row('Xe khách', `${trip.bus?.registrationPlate || ''} ${trip.bus?.busName ? '— ' + trip.bus.busName : ''} (${trip.bus?.busType || ''})`)}
         {row('Giờ khởi hành', fmtDT(trip.departureTime))}
@@ -316,7 +318,7 @@ export default function AdminTrips() {
           <span style={{ color: '#7B5FA0', fontSize: '0.82rem' }}>{totalEls} chuyến</span>
           <RefreshButton onClick={() => fetchTrips(page, filterStatus)} />
           <button onClick={() => setShowForm(v => !v)} style={{ background: showForm ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', padding: '0.45rem 1.1rem', borderRadius: 10, fontWeight: 700, fontSize: '0.86rem', cursor: 'pointer', fontFamily: 'inherit' }}>
-            {showForm ? '✕ Đóng form' : '➕ Thêm chuyến'}
+            {showForm ? <><X size={16} /> Đóng form</> : <><Plus size={16} /> Thêm chuyến</>}
           </button>
         </div>
       </div>
@@ -334,7 +336,7 @@ export default function AdminTrips() {
             </tr>
           </thead>
           <tbody>
-            {loading ? <LoadingRow colSpan={9} /> : trips.length === 0 ? <EmptyRow colSpan={9} icon="🚌" message="Không có chuyến đi nào" /> : trips.map((t, i) => (
+            {loading ? <LoadingRow colSpan={9} /> : trips.length === 0 ? <EmptyRow colSpan={9} icon={<Bus size={32} />} message="Không có chuyến đi nào" /> : trips.map((t, i) => (
               <tr key={t.tripId} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.012)', cursor: 'pointer' }}
                 onClick={() => setDetail(t)}>
                 <td style={{ ...td(), color: '#FF6B9D', fontWeight: 700 }}>#{t.tripId}</td>
@@ -349,13 +351,13 @@ export default function AdminTrips() {
                 <td style={td()}><StatusBadge status={t.status} /></td>
                 <td style={{ ...td(), textAlign: 'center' }} onClick={e => e.stopPropagation()}>
                   <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center' }}>
-                    <button onClick={() => setDetail(t)} style={{ background: 'rgba(33,150,243,0.12)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.35)', padding: '0.28rem 0.65rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.73rem', fontWeight: 700, fontFamily: 'inherit' }}>
-                      👁 Chi tiết
+                    <button onClick={() => setDetail(t)} style={{ background: 'rgba(33,150,243,0.12)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.35)', padding: '0.28rem 0.65rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.73rem', fontWeight: 700, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Eye size={14} /> Chi tiết
                     </button>
                     {t.status !== 'CANCELLED' && t.status !== 'COMPLETED' && (
                       <button onClick={() => { if (window.confirm('Huỷ chuyến đi này?')) handleChangeStatus(t.tripId, 'CANCELLED') }}
-                        style={{ background: 'rgba(244,67,54,0.12)', color: '#F44336', border: '1px solid rgba(244,67,54,0.35)', padding: '0.28rem 0.65rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.73rem', fontWeight: 700, fontFamily: 'inherit' }}>
-                        ❌ Huỷ
+                        style={{ background: 'rgba(244,67,54,0.12)', color: '#F44336', border: '1px solid rgba(244,67,54,0.35)', padding: '0.28rem 0.65rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.73rem', fontWeight: 700, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <XCircle size={14} /> Huỷ
                       </button>
                     )}
                   </div>

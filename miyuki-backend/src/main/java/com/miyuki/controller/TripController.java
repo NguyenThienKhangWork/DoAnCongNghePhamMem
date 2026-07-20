@@ -52,7 +52,10 @@ public class TripController {
             request.getBusId(),
             request.getDepartureTime(),
             request.getArrivalTime(),
-            request.getPrice()
+            request.getPrice(),
+            request.getVipSeats(),
+            request.getWindowSeats(),
+            request.getRegularSeats()
         );
         return ResponseEntity.ok(trip);
     }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { DollarSign, Clock, Check, X } from 'lucide-react'
 import { adminService } from '../../services/api'
 import { th, td, TableCard, LoadingRow, EmptyRow, Pagination } from '../../components/admin/AdminTable'
 
@@ -9,10 +10,10 @@ const STATUS_MAP = {
   REJECTED:  { label: 'Từ chối',    color: '#F44336', bg: 'rgba(244,67,54,0.12)' },
 }
 
-function StatsCard({ icon, label, value }) {
+function StatsCard({ icon: Icon, label, value }) {
   return (
     <div style={{ flex: '1 1 180px', background: 'rgba(13,27,42,0.95)', border: '1px solid rgba(255,107,157,0.2)', borderRadius: 12, padding: '0.9rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-      <span style={{ fontSize: '1.5rem' }}>{icon}</span>
+      <Icon size={24} />
       <div>
         <div style={{ color: '#B0A0CC', fontSize: '0.72rem', fontWeight: 600 }}>{label}</div>
         <div style={{ fontSize: '1.1rem', fontWeight: 900, background: 'linear-gradient(135deg,#FF6B9D,#FFD700)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{value}</div>
@@ -51,9 +52,9 @@ export default function AdminRefunds() {
   return (
     <div>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        <StatsCard icon="💸" label="Tổng yêu cầu" value={total} />
-        <StatsCard icon="⏳" label="Chờ duyệt" value={items.filter(r => r.refundStatus === 'PENDING').length} />
-        <StatsCard icon="💰" label="Tổng tiền hoàn (trang này)" value={totalAmt.toLocaleString('vi-VN') + 'đ'} />
+        <StatsCard icon={DollarSign} label="Tổng yêu cầu" value={total} />
+        <StatsCard icon={Clock}      label="Chờ duyệt"    value={items.filter(r => r.refundStatus === 'PENDING').length} />
+        <StatsCard icon={DollarSign} label="Tổng tiền hoàn (trang này)" value={totalAmt.toLocaleString('vi-VN') + 'đ'} />
       </div>
 
       <TableCard>
@@ -62,7 +63,7 @@ export default function AdminRefunds() {
             <tr>{['ID', 'Mã vé', 'Khách hàng', 'Số tiền hoàn', 'Lý do', 'Trạng thái', 'Hành động'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
           </thead>
           <tbody>
-            {loading ? <LoadingRow colSpan={7} /> : items.length === 0 ? <EmptyRow colSpan={7} message="Chưa có yêu cầu hoàn tiền" icon="💸" /> : items.map((r, i) => {
+            {loading ? <LoadingRow colSpan={7} /> : items.length === 0 ? <EmptyRow colSpan={7} message="Chưa có yêu cầu hoàn tiền" icon={<DollarSign size={32} />} /> : items.map((r, i) => {
               const st = STATUS_MAP[r.refundStatus] || STATUS_MAP.PENDING
               return (
                 <tr key={r.refundId} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)' }}>
@@ -78,19 +79,19 @@ export default function AdminRefunds() {
                     {r.refundStatus === 'PENDING' && (
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
                         <button onClick={() => handleStatus(r.refundId, 'APPROVED')} disabled={updating === r.refundId}
-                          style={{ background: 'rgba(33,150,243,0.15)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.4)', padding: '0.25rem 0.7rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700 }}>
-                          ✓ Duyệt
+                          style={{ background: 'rgba(33,150,243,0.15)', color: '#2196F3', border: '1px solid rgba(33,150,243,0.4)', padding: '0.25rem 0.7rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                          <Check size={14} /> Duyệt
                         </button>
                         <button onClick={() => handleStatus(r.refundId, 'REJECTED')} disabled={updating === r.refundId}
-                          style={{ background: 'rgba(244,67,54,0.15)', color: '#F44336', border: '1px solid rgba(244,67,54,0.4)', padding: '0.25rem 0.7rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700 }}>
-                          ✕ Từ chối
+                          style={{ background: 'rgba(244,67,54,0.15)', color: '#F44336', border: '1px solid rgba(244,67,54,0.4)', padding: '0.25rem 0.7rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                          <X size={14} /> Từ chối
                         </button>
                       </div>
                     )}
                     {r.refundStatus === 'APPROVED' && (
                       <button onClick={() => handleStatus(r.refundId, 'COMPLETED')} disabled={updating === r.refundId}
-                        style={{ background: 'rgba(76,175,80,0.15)', color: '#4CAF50', border: '1px solid rgba(76,175,80,0.4)', padding: '0.25rem 0.7rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700 }}>
-                        💰 Hoàn tiền
+                        style={{ background: 'rgba(76,175,80,0.15)', color: '#4CAF50', border: '1px solid rgba(76,175,80,0.4)', padding: '0.25rem 0.7rem', borderRadius: 8, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                        <DollarSign size={14} /> Hoàn tiền
                       </button>
                     )}
                   </td>
