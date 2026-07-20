@@ -26,17 +26,59 @@ function StatusBadge({ status }) {
   return <span style={{ background: s.bg, color: s.color, padding: '0.2rem 0.65rem', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
 }
 
+// Label màu loại ghế
+const SEAT_TYPE_COLORS = {
+  VIP:     { bg: 'rgba(255,193,7,0.15)',  border: 'rgba(255,193,7,0.5)',  color: '#FFC107', icon: '⭐' },
+  WINDOW:  { bg: 'rgba(33,150,243,0.15)', border: 'rgba(33,150,243,0.5)', color: '#2196F3', icon: '🪟' },
+  REGULAR: { bg: 'rgba(76,175,80,0.15)',  border: 'rgba(76,175,80,0.5)',  color: '#4CAF50', icon: '💺' },
+}
+
 function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
-  const [form, setForm] = useState(initial || { routeId: '', busId: '', departureTime: '', arrivalTime: '', price: '' })
+  const [form, setForm] = useState(initial || {
+    routeId: '', busId: '', departureTime: '', arrivalTime: '', price: '',
+    vipSeats: '', windowSeats: '', regularSeats: '',
+  })
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  // Xe đang được chọn
+  const selectedBus = buses.find(b => String(b.busId) === String(form.busId))
+  const busTotal    = selectedBus?.totalSeats ?? 0
+  const busType     = selectedBus?.busType ?? ''
+
+  // Tổng ghế đã điền
+  const vip     = parseInt(form.vipSeats)     || 0
+  const window_ = parseInt(form.windowSeats)  || 0
+  const regular = parseInt(form.regularSeats) || 0
+  const filledTotal = vip + window_ + regular
+  const hasCustom   = vip > 0 || window_ > 0 || regular > 0
+  const overLimit   = busTotal > 0 && filledTotal > busTotal
+  const remaining   = busTotal - filledTotal
+
+  // Gợi ý mặc định dựa theo loại xe
+  const autoHint = busType === 'LIMOUSINE' || busType === 'SLEEPER'
+    ? `Tự động: ${busTotal} ghế VIP`
+    : busTotal > 0
+      ? `Tự động: ${Math.max(1, Math.ceil(busTotal * 0.1))} VIP · ${Math.max(1, Math.ceil(busTotal * 0.2))} WINDOW · ${busTotal - Math.max(1, Math.ceil(busTotal * 0.1)) - Math.max(1, Math.ceil(busTotal * 0.2))} REGULAR`
+      : ''
 
   const handleSubmit = e => {
     e.preventDefault()
     if (new Date(form.arrivalTime) <= new Date(form.departureTime)) {
-      alert('Giờ đến phải sau giờ đi')
-      return
+      alert('Giờ đến phải sau giờ đi'); return
     }
-    onSave({ routeId: Number(form.routeId), busId: Number(form.busId), departureTime: form.departureTime, arrivalTime: form.arrivalTime, price: Number(form.price) })
+    if (hasCustom && overLimit) {
+      alert(`Tổng ghế (${filledTotal}) vượt quá sức chứa xe (${busTotal})`); return
+    }
+    onSave({
+      routeId: Number(form.routeId),
+      busId: Number(form.busId),
+      departureTime: form.departureTime,
+      arrivalTime: form.arrivalTime,
+      price: Number(form.price),
+      vipSeats:     form.vipSeats     !== '' ? Number(form.vipSeats)     : null,
+      windowSeats:  form.windowSeats  !== '' ? Number(form.windowSeats)  : null,
+      regularSeats: form.regularSeats !== '' ? Number(form.regularSeats) : null,
+    })
   }
 
   const lbl = s => <label style={{ color: '#B0A0CC', fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '0.3rem' }}>{s}</label>
@@ -47,38 +89,104 @@ function TripForm({ routes, buses, initial, onSave, onClose, saving }) {
         <h3 style={{ color: 'white', margin: 0, fontWeight: 800 }}>{initial?.tripId ? '✏️ Cập nhật chuyến đi' : '➕ Thêm chuyến mới'}</h3>
         <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ccc', width: 30, height: 30, borderRadius: '50%', cursor: 'pointer', fontSize: '0.9rem' }}>✕</button>
       </div>
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <div>
-          {lbl('Tuyến đường *')}
-          <select value={form.routeId} onChange={e => set('routeId', e.target.value)} required style={{ ...inp, appearance: 'none' }}>
-            <option value="">-- Chọn tuyến --</option>
-            {routes.map(r => <option key={r.routeId} value={r.routeId}>{r.departureCity} → {r.destinationCity}</option>)}
-          </select>
+
+      <form onSubmit={handleSubmit}>
+        {/* ── Thông tin chuyến ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+          <div>
+            {lbl('Tuyến đường *')}
+            <select value={form.routeId} onChange={e => set('routeId', e.target.value)} required style={{ ...inp, appearance: 'none' }}>
+              <option value="">-- Chọn tuyến --</option>
+              {routes.map(r => <option key={r.routeId} value={r.routeId}>{r.departureCity} → {r.destinationCity}</option>)}
+            </select>
+          </div>
+          <div>
+            {lbl('Xe khách *')}
+            <select value={form.busId} onChange={e => { set('busId', e.target.value); setForm(f => ({ ...f, busId: e.target.value, vipSeats: '', windowSeats: '', regularSeats: '' })) }} required style={{ ...inp, appearance: 'none' }}>
+              <option value="">-- Chọn xe --</option>
+              {buses.map(b => <option key={b.busId} value={b.busId}>{b.registrationPlate || b.busName} — {b.totalSeats} chỗ ({b.busType})</option>)}
+            </select>
+          </div>
+          <div>
+            {lbl('Giờ khởi hành *')}
+            <input type="datetime-local" value={form.departureTime} onChange={e => set('departureTime', e.target.value)} required style={inp} />
+          </div>
+          <div>
+            {lbl('Giờ đến *')}
+            <input type="datetime-local" value={form.arrivalTime} onChange={e => set('arrivalTime', e.target.value)} required style={inp} />
+          </div>
+          <div>
+            {lbl('Giá vé (VNĐ) *')}
+            <input type="number" min="1000" placeholder="250000" value={form.price} onChange={e => set('price', e.target.value)} required style={inp} />
+          </div>
         </div>
-        <div>
-          {lbl('Xe khách *')}
-          <select value={form.busId} onChange={e => set('busId', e.target.value)} required style={{ ...inp, appearance: 'none' }}>
-            <option value="">-- Chọn xe --</option>
-            {buses.map(b => <option key={b.busId} value={b.busId}>{b.registrationPlate || b.busName} — {b.totalSeats} chỗ ({b.busType})</option>)}
-          </select>
-        </div>
-        <div>
-          {lbl('Giờ khởi hành *')}
-          <input type="datetime-local" value={form.departureTime} onChange={e => set('departureTime', e.target.value)} required style={inp} />
-        </div>
-        <div>
-          {lbl('Giờ đến *')}
-          <input type="datetime-local" value={form.arrivalTime} onChange={e => set('arrivalTime', e.target.value)} required style={inp} />
-        </div>
-        <div>
-          {lbl('Giá vé (VNĐ) *')}
-          <input type="number" min="1000" placeholder="250000" value={form.price} onChange={e => set('price', e.target.value)} required style={inp} />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-          <button type="submit" disabled={saving} style={{ width: '100%', background: saving ? 'rgba(123,47,190,0.4)' : 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', borderRadius: 10, padding: '0.65rem', fontWeight: 800, fontSize: '0.9rem', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
-            {saving ? '⏳ Đang lưu...' : initial?.tripId ? '💾 Cập nhật' : '✅ Tạo chuyến'}
-          </button>
-        </div>
+
+        {/* ── Cấu hình ghế (chỉ hiện khi đã chọn xe) ── */}
+        {selectedBus && (
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,107,157,0.2)', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <span style={{ color: 'white', fontWeight: 700, fontSize: '0.88rem' }}>🪑 Cấu hình ghế</span>
+              <span style={{ fontSize: '0.75rem', color: '#B0A0CC' }}>
+                Sức chứa: <strong style={{ color: 'white' }}>{busTotal} ghế</strong>
+                {busType && <span style={{ marginLeft: '0.5rem', background: 'rgba(255,107,157,0.15)', color: '#FF6B9D', padding: '0.1rem 0.5rem', borderRadius: 20, fontSize: '0.7rem' }}>{busType}</span>}
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              {[
+                { key: 'vipSeats',     label: 'Ghế VIP',     type: 'VIP'     },
+                { key: 'windowSeats',  label: 'Ghế WINDOW',  type: 'WINDOW'  },
+                { key: 'regularSeats', label: 'Ghế REGULAR', type: 'REGULAR' },
+              ].map(({ key, label, type }) => {
+                const c = SEAT_TYPE_COLORS[type]
+                return (
+                  <div key={key}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.3rem' }}>
+                      <span style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.color, borderRadius: 6, padding: '0.1rem 0.4rem', fontSize: '0.7rem' }}>
+                        {c.icon} {type}
+                      </span>
+                    </label>
+                    <input
+                      type="number" min="0" max={busTotal}
+                      placeholder="0 (tự động)"
+                      value={form[key]}
+                      onChange={e => set(key, e.target.value)}
+                      style={{ ...inp, borderColor: form[key] !== '' ? c.border : 'rgba(255,107,157,0.3)' }}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Progress bar + trạng thái */}
+            {hasCustom ? (
+              <div>
+                {/* Progress bar */}
+                <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden', marginBottom: '0.4rem', display: 'flex' }}>
+                  {vip > 0     && <div style={{ width: `${(vip / busTotal) * 100}%`,     background: SEAT_TYPE_COLORS.VIP.color,     transition: 'width 0.3s' }} />}
+                  {window_ > 0 && <div style={{ width: `${(window_ / busTotal) * 100}%`, background: SEAT_TYPE_COLORS.WINDOW.color,  transition: 'width 0.3s' }} />}
+                  {regular > 0 && <div style={{ width: `${(regular / busTotal) * 100}%`, background: SEAT_TYPE_COLORS.REGULAR.color, transition: 'width 0.3s' }} />}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: overLimit ? '#f87171' : '#4ade80', fontWeight: 700 }}>
+                    {overLimit ? `⚠ Vượt ${filledTotal - busTotal} ghế` : `✓ ${filledTotal}/${busTotal} ghế đã phân bổ`}
+                  </span>
+                  {!overLimit && remaining > 0 && (
+                    <span style={{ color: '#B0A0CC' }}>Còn trống: {remaining} ghế</span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div style={{ fontSize: '0.75rem', color: '#B0A0CC', fontStyle: 'italic' }}>
+                💡 Để trống → {autoHint}
+              </div>
+            )}
+          </div>
+        )}
+
+        <button type="submit" disabled={saving || overLimit} style={{ width: '100%', background: (saving || overLimit) ? 'rgba(123,47,190,0.4)' : 'linear-gradient(135deg,#FF6B9D,#7B2FBE)', color: 'white', border: 'none', borderRadius: 10, padding: '0.65rem', fontWeight: 800, fontSize: '0.9rem', cursor: (saving || overLimit) ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
+          {saving ? '⏳ Đang lưu...' : initial?.tripId ? '💾 Cập nhật' : '✅ Tạo chuyến'}
+        </button>
       </form>
     </div>
   )

@@ -44,12 +44,32 @@ public class TripService {
 
     @Transactional
     public Trip createTrip(Long routeId, Long busId, LocalDateTime departureTime,
-                           LocalDateTime arrivalTime, BigDecimal price) {
+                           LocalDateTime arrivalTime, BigDecimal price,
+                           Integer vipSeats, Integer windowSeats, Integer regularSeats) {
         Route route = routeRepository.findById(routeId)
             .orElseThrow(() -> new ResourceNotFoundException("Tuyến đường không tồn tại"));
 
         Bus bus = busRepository.findById(busId)
             .orElseThrow(() -> new ResourceNotFoundException("Xe không tồn tại"));
+
+        // Xác định tổng ghế từ cấu hình admin hoặc lấy từ xe
+        int totalSeats = bus.getTotalSeats();
+        boolean hasCustomConfig = vipSeats != null || windowSeats != null || regularSeats != null;
+
+        if (hasCustomConfig) {
+            int v = vipSeats    != null ? vipSeats    : 0;
+            int w = windowSeats != null ? windowSeats : 0;
+            int r = regularSeats != null ? regularSeats : 0;
+            int customTotal = v + w + r;
+            if (customTotal == 0) {
+                throw new IllegalArgumentException("Tổng số ghế phải lớn hơn 0");
+            }
+            if (customTotal > totalSeats) {
+                throw new IllegalArgumentException(
+                    "Tổng ghế (" + customTotal + ") vượt quá sức chứa xe (" + totalSeats + ")");
+            }
+            totalSeats = customTotal;
+        }
 
         Trip trip = Trip.builder()
             .route(route)
@@ -57,14 +77,20 @@ public class TripService {
             .departureTime(departureTime)
             .arrivalTime(arrivalTime)
             .price(price)
-            .availableSeats(bus.getTotalSeats())
+            .availableSeats(totalSeats)
             .status(Trip.TripStatus.SCHEDULED)
             .build();
 
         Trip savedTrip = tripRepository.save(trip);
 
-        // Tự động tạo ghế dựa trên số ghế của xe
-        generateSeatsForTrip(savedTrip, bus.getTotalSeats());
+        if (hasCustomConfig) {
+            generateSeatsCustom(savedTrip,
+                vipSeats    != null ? vipSeats    : 0,
+                windowSeats != null ? windowSeats : 0,
+                regularSeats != null ? regularSeats : 0);
+        } else {
+            generateSeatsForTrip(savedTrip, bus.getTotalSeats(), bus.getBusType());
+        }
 
         return savedTrip;
     }
@@ -82,14 +108,8 @@ public class TripService {
 
     // ─── Tạo ghế tự động theo số lượng và loại xe ──────────────────────────
 
-    private void generateSeatsForTrip(Trip trip, int totalSeats) {
+    private void generateSeatsForTrip(Trip trip, int totalSeats, Bus.BusType busType) {
         List<Seat> seats = new ArrayList<>();
-
-        // Phân loại ghế theo loại xe:
-        // - LIMOUSINE: tất cả VIP
-        // - SLEEPER: tất cả VIP
-        // - SEAT: 10% đầu là VIP, 20% tiếp theo là WINDOW, còn lại REGULAR
-        Bus.BusType busType = trip.getBus().getBusType();
 
         for (int i = 1; i <= totalSeats; i++) {
             Seat.SeatType seatType;
@@ -97,7 +117,6 @@ public class TripService {
             if (busType == Bus.BusType.LIMOUSINE || busType == Bus.BusType.SLEEPER) {
                 seatType = Seat.SeatType.VIP;
             } else {
-                // SEAT bus: 10% VIP, 20% WINDOW, 70% REGULAR
                 int vipCount    = Math.max(1, (int) Math.ceil(totalSeats * 0.10));
                 int windowCount = Math.max(1, (int) Math.ceil(totalSeats * 0.20));
                 if (i <= vipCount) {
@@ -109,11 +128,9 @@ public class TripService {
                 }
             }
 
-            String seatNumber = formatSeatNumber(i, totalSeats);
-
             seats.add(Seat.builder()
                 .trip(trip)
-                .seatNumber(seatNumber)
+                .seatNumber(formatSeatNumber(i))
                 .seatType(seatType)
                 .isAvailable(true)
                 .build());
@@ -122,11 +139,37 @@ public class TripService {
         seatRepository.saveAll(seats);
     }
 
-    private String formatSeatNumber(int index, int total) {
-        // Format: A1, A2... B1, B2... (mỗi hàng 4 ghế)
+    /**
+     * Tạo ghế theo cấu hình tùy chỉnh từ admin.
+     * Thứ tự: VIP trước (hàng A...), WINDOW tiếp, REGULAR cuối.
+     */
+    private void generateSeatsCustom(Trip trip, int vipCount, int windowCount, int regularCount) {
+        List<Seat> seats = new ArrayList<>();
+        int index = 1;
+
+        for (int i = 0; i < vipCount; i++, index++) {
+            seats.add(Seat.builder()
+                .trip(trip).seatNumber(formatSeatNumber(index))
+                .seatType(Seat.SeatType.VIP).isAvailable(true).build());
+        }
+        for (int i = 0; i < windowCount; i++, index++) {
+            seats.add(Seat.builder()
+                .trip(trip).seatNumber(formatSeatNumber(index))
+                .seatType(Seat.SeatType.WINDOW).isAvailable(true).build());
+        }
+        for (int i = 0; i < regularCount; i++, index++) {
+            seats.add(Seat.builder()
+                .trip(trip).seatNumber(formatSeatNumber(index))
+                .seatType(Seat.SeatType.REGULAR).isAvailable(true).build());
+        }
+
+        seatRepository.saveAll(seats);
+    }
+
+    private String formatSeatNumber(int index) {
         int seatsPerRow = 4;
-        int row = (index - 1) / seatsPerRow;        // 0-based row index
-        int col = (index - 1) % seatsPerRow + 1;    // 1-based column
+        int row = (index - 1) / seatsPerRow;
+        int col = (index - 1) % seatsPerRow + 1;
         char rowChar = (char) ('A' + row);
         return rowChar + String.valueOf(col);
     }

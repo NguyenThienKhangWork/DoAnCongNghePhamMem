@@ -10,15 +10,12 @@ public class CreateTripRequest {
     private LocalDateTime arrivalTime;
     private BigDecimal price;
 
+    // Số ghế theo từng loại — null = dùng phân bổ tự động theo loại xe
+    private Integer vipSeats;
+    private Integer windowSeats;
+    private Integer regularSeats;
+
     public CreateTripRequest() {}
-    public CreateTripRequest(Long routeId, Long busId, LocalDateTime departureTime,
-                            LocalDateTime arrivalTime, BigDecimal price) {
-        this.routeId = routeId;
-        this.busId = busId;
-        this.departureTime = departureTime;
-        this.arrivalTime = arrivalTime;
-        this.price = price;
-    }
 
     public Long getRouteId() { return routeId; }
     public void setRouteId(Long routeId) { this.routeId = routeId; }
@@ -34,4 +31,13 @@ public class CreateTripRequest {
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
+
+    public Integer getVipSeats() { return vipSeats; }
+    public void setVipSeats(Integer vipSeats) { this.vipSeats = vipSeats; }
+
+    public Integer getWindowSeats() { return windowSeats; }
+    public void setWindowSeats(Integer windowSeats) { this.windowSeats = windowSeats; }
+
+    public Integer getRegularSeats() { return regularSeats; }
+    public void setRegularSeats(Integer regularSeats) { this.regularSeats = regularSeats; }
 }
